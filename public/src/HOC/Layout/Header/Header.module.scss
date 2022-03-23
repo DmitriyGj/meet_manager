@@ -1,0 +1,28 @@
+.Header{
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items:center;
+    align-items: center;
+
+    & .Logo {
+        width: 15%;
+        text-align: center;
+
+        &:hover{
+            cursor: pointer;
+        }
+    }
+
+    & .Nav {
+        display: flex;
+        flex-direction: row;
+        width: 85%;
+        justify-content: space-around;
+
+        & >:hover{
+            color:white;
+            cursor: pointer;
+        }
+    }
+}

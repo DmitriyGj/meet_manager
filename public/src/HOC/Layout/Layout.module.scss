@@ -1,0 +1,29 @@
+.Layout{ 
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 30% 70%;
+    grid-template-rows: 10% 80% 10%;
+    height: 100vh;
+    justify-content: center;
+    background-color: gray;
+
+    & * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .Header{
+        grid-column:1/-1 ;
+        grid-row:1/2;
+    }
+    
+    .Footer{
+        grid-column:1/-1;
+        grid-row:3/-1;
+    }
+    .Body{
+        grid-column: 1/-1;
+        grid-row:2/3;
+    }
+}

@@ -5,10 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p $PORT",
-    "prestart": "next build",
-    "lint": "next lint",
-    "heroku-postbuild":"npm run build"
+    "start": "next start -p $PORT"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",

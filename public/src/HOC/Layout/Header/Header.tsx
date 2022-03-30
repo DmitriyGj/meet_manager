@@ -1,36 +1,26 @@
-import { DetailedHTMLProps, HTMLAttributes } from "react";
+import { DetailedHTMLProps, HTMLAttributes, ReactElement } from "react";
 import cn from 'classnames';
 import style from './Header.module.scss';
-import Link from "next/link";
+import { ExtendedLink } from '../../../Components/ExtendedLink/ExtendedLink';
+import Logo from '../../../media/logo.svg';
+
 
 export interface IHeaderProps extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>{
-    title:string
+    logo:ReactElement
 }
 
-export const Header = ( {title,className,...props }: IHeaderProps ) => {
+export const Header = ( {logo,className,...props }: IHeaderProps ) => {
     return(<div className = {cn(style.Header, className)} {...props}>
-        <Link href = '/'>
-            <a>
-                <h1 className = {style.Logo}>{ title }</h1>
-            </a>
-        </Link>
+        <ExtendedLink href='/'>
+            <div className={style.Logo}>
+                {logo}
+            </div>
+        </ExtendedLink>
         <nav className={style.Nav}>
-            <h1>Главная</h1>
-            <Link href = '/meetings'>
-                <a>
-                    <h1>Встречи</h1>
-                </a>
-            </Link>
-            <Link href = '/employes'>
-                <a>
-                    <h1>Работники</h1>
-                </a>
-            </Link>
-            <Link href = '/guests'>
-                <a>
-                    <h1>Гости</h1>
-                </a>
-            </Link>
+            <ExtendedLink href='/' title="Главная" />
+            <ExtendedLink href='/meetings' title = 'Встречи' />
+            <ExtendedLink href='/employes' title =' Работники' />
+            <ExtendedLink href='/guests' title='Гости' />
         </nav>
     </div>)
 }

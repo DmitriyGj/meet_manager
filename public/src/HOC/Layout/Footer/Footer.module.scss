@@ -1,6 +1,27 @@
 .Footer {
-    display: flex;
+    display: grid;
     text-align: center;
     align-items: center;
     justify-content: center;
+    grid-template-columns: 40% 60%;
+
+    .Logo {
+        width: 8%;
+        margin-left: 10%;
+        align-self: center;
+    }
+
+    .Links{
+        > * {
+            display: grid;
+            grid-template-columns: 30% 30%;
+            justify-content: center;
+        }
+        font-size: 12px ;
+        > * >:hover{
+            color:white;
+            cursor:pointer;
+        }
+    }
+
 }

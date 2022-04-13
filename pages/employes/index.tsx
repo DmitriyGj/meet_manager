@@ -1,4 +1,4 @@
-import type { GetStaticProps, NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
 import styles from '../../styles/Home.module.css'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import Button  from '@mui/material/Button'
@@ -88,7 +88,7 @@ const Employes = ({rows, columns} : IEmployesPage) => {
     )
 }
 
-export const getStaticProps: GetStaticProps  = async ( ) => {
+export const getServerSideProps: GetServerSideProps  = async ( ) => {
         try{
             const data = await fetch('https://meet-manager-backend.herokuapp.com/api/employes');
             console.log(data)

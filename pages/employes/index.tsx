@@ -1,9 +1,10 @@
 import type { GetStaticProps, NextPage } from 'next'
-import styles from '../styles/Home.module.css'
+import styles from '../../styles/Home.module.css'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import Button  from '@mui/material/Button'
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
+import EmployeAPI from '../../public/src/API/EmployeAPI';
 
 const rows: GridRowsProp = [
     { id: 1, col1: 'Hello', col2: 'World' },
@@ -50,14 +51,7 @@ const Employes = ({rows, columns} : IEmployesPage) => {
                                             (async () => {
                                                 try{
                                                     if(selectedRow){
-                                                        const res = await fetch(`http://localhost:8081/api/employes/${selectedRow}`,{
-                                                            method:'DELETE',
-                                                            headers:{
-                                                                'Content-type':'application/json'
-                                                            },
-                                                            body:JSON.stringify({id:selectedRow})
-                                                        })
-                                                        console.log(await res.json());
+                                                        await EmployeAPI.removeEmploye(selectedRow.toString());
                                                     }
                                                     else{
                                                         alert('Выберите запись');
@@ -96,7 +90,8 @@ const Employes = ({rows, columns} : IEmployesPage) => {
 
 export const getStaticProps: GetStaticProps  = async ( ) => {
         try{
-            const data = await fetch('http://localhost:8081/api/employes');
+            const data = await fetch('https://meet-manager-backend.herokuapp.com/api/employes');
+            console.log(data)
             const parsedData = await data.json();
             const columns = Object.keys(parsedData[0]).map((col: string) =>( {field:col, headerName:col, width:150}));
             const rows = parsedData.map((item: any) => ({id: item.ID, ...item}))

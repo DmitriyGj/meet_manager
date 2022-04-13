@@ -2,7 +2,6 @@ import type { NextPage } from 'next'
 import styles from '../styles/Home.module.css'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import Button  from '@mui/material/Button'
-import { useEffect } from 'react';
 
 const rows: GridRowsProp = [
     { id: 1, col1: 'Hello', col2: 'World' },
@@ -16,19 +15,6 @@ const columns: GridColDef[] = [
 ];
 
 const Guests: NextPage = () => {
-    useEffect(() => {
-        (async() => {
-            console.log('posting')
-            const res = await fetch('http://localhost:8081/api/departaments',{
-                method:'POST',
-                headers:{
-                    'Content-Type': 'application/json;charset=utf-8'
-                },
-                body: JSON.stringify({NAME:'Test otdel'})
-            })
-            console.log(res);
-        })()
-    })
 
     return (<div className={styles.container}>
             <h1>Гости</h1>

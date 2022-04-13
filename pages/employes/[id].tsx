@@ -2,6 +2,7 @@ import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
 import { useState } from "react";
 import style from './addEmploye.module.scss';
+import EmployeAPI from '../../public/src/API/EmployeAPI';
 
 interface EditEmployePageProps {
     employeInfo:{
@@ -65,7 +66,7 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
                         e.preventDefault();
                         (async() => {
                             try{
-                                const res = await fetch(`http://localhost:8081/api/employes/${+employeInfo.ID}`,
+                                const res = await fetch(`https://meet-manager-backend.herokuapp.com/api/employes/${+employeInfo.ID}`,
                                 {
                                     method:'PUT',
                                     headers:{
@@ -93,8 +94,8 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
 
 export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
-    const selectRes = await fetch('http://localhost:8081/api/posts');
-    const empRes = await fetch(`http://localhost:8081/api/employes/${id}`);
+    const selectRes = await fetch('https://meet-manager-backend.herokuapp.com/api/posts');
+    const empRes = await fetch(`https://meet-manager-backend.herokuapp.com/api/employes/${id}`);
     const selectOptions = await selectRes.json();
     const employeInfo = (await empRes.json())[0];
 

@@ -1,14 +1,13 @@
 import {baseURL} from '../constants';
 
-class EmployeAPI {
+class PostAPI {
     
-    baseURL = `${baseURL}/api/employes`;
+    baseURL = `${baseURL}/api/posts`;
     
-    getEmployes = async () => {
+    getPosts = async () => {
         try{
             const res = await fetch(`${this.baseURL}`);
             const parsedData = await res.json();
-            console.log(parsedData)
             return parsedData;
         }
         catch(e) {
@@ -16,7 +15,7 @@ class EmployeAPI {
         }
     }
     
-    getEmployeById = async (id:string) => {
+    getPostById = async (id:string) => {
         try{
             const res = await fetch(`${this.baseURL}/${id}`);
             const parsedData = await res.json();
@@ -27,7 +26,7 @@ class EmployeAPI {
         }
     } 
     
-    removeEmploye = async (id:string) => {
+    removePost= async (id:string) => {
         try{
             const res = await fetch(`${this.baseURL}/${id}`,
                 {
@@ -43,7 +42,7 @@ class EmployeAPI {
         }
     }
 
-    addEmploye = async (employeInfo: any) => {
+    addPost = async (postName: string) => {
         try {
             const res = await fetch(`${this.baseURL}`,
             {
@@ -51,7 +50,7 @@ class EmployeAPI {
                 headers:{
                     'Content-type':'application/json'
                 },
-                body: JSON.stringify(employeInfo)
+                body: JSON.stringify(postName)
             })
         }
         catch(e){
@@ -59,15 +58,15 @@ class EmployeAPI {
         }
     }
 
-    editEmploye = async (employeId: number, data: any)=> {
+    editPost = async (postId: number, name: string)=> {
         try{
-            const res = await fetch(`${this.baseURL}/${employeId}`,
+            const res = await fetch(`${this.baseURL}/${postId}`,
             {
                 method:'PUT',
                 headers:{
                     'Content-type':'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(name)
             })
         }
         catch(e){
@@ -77,4 +76,4 @@ class EmployeAPI {
     }
 }
 
-export default new EmployeAPI();
+export default new PostAPI();

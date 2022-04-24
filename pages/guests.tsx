@@ -2,6 +2,9 @@ import type { NextPage } from 'next'
 import styles from '../styles/Home.module.css'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import Button  from '@mui/material/Button'
+import { useEffect } from 'react';
+import { baseURL } from '../public/src/constants';
+import EmployeAPI from '../public/src/API/EmployeAPI';
 
 const rows: GridRowsProp = [
     { id: 1, col1: 'Hello', col2: 'World' },
@@ -15,6 +18,13 @@ const columns: GridColDef[] = [
 ];
 
 const Guests: NextPage = () => {
+    useEffect(() => {
+        (async () => {
+        const data = await EmployeAPI.getEmployes()
+        console.log(data)
+        })()
+    }
+    )
 
     return (<div className={styles.container}>
             <h1>Гости</h1>

@@ -1,8 +1,10 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { useState } from "react";
+import { ChangeEvent, MouseEventHandler, useState } from "react";
 import style from './addEmploye.module.scss';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
+import PostAPI from "../../public/src/API/PostAPI";
+import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 
 interface EditEmployePageProps {
     employeInfo:{
@@ -20,6 +22,27 @@ interface EditEmployePageProps {
 
 const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
     const [currentEmployeInfo, setEmployeInfo] = useState(employeInfo);
+
+    const clickSendHandler: MouseEventHandler = (e) => {
+        e.preventDefault();
+        (async() => {
+            try{
+                await EmployeAPI.editEmploye(+employeInfo.ID, currentEmployeInfo);
+            }
+            catch(e){
+                alert('что-то пошло не так')
+            }
+            finally{
+                router.push('/employes')
+            }
+
+        })();
+    };
+    const changeInputHandler = (key:string) => ({target}:ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setEmployeInfo({...currentEmployeInfo,[key]:target?.value})
+    }
+
+    
     const router = useRouter();
     return(
         <div>
@@ -28,63 +51,32 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
                     {Object.entries(currentEmployeInfo).map(([key,value]) =>{
                         return(
                             (key !== 'ID') && (
-                            key != 'POST_ID' ? 
-                            <label>{key}
-                            <input
-                                value={ value }
-                                onChange={
-                                (e) => {
-                                    setEmployeInfo({...currentEmployeInfo,[key]:e.target.value})
+                            <label>{translatorFieldsToRULabels.Employe[key]}
+                            {   key != 'POST_ID' ? 
+                                <input value={ value }
+                                    onChange={changeInputHandler(key)}
+                                    key={key} 
+                                    name={key} 
+                                    type='text'/> 
+                                :   
+                                <select  value={currentEmployeInfo[key]}
+                                        name='POST_ID'
+                                        onChange={changeInputHandler(key)}>
+                                    {selectOptions.map(({ID, POST_NAME}) => {
+                                        return <option key = {ID}
+                                                    value = {ID}>
+                                                    {POST_NAME}
+                                                </option>
+                                    })}
+                                </select>
                                 }
-                            }
-                                key={key} 
-                                name={key} 
-                                type='text'/> </label>
-                            :   
-                            <label>{key}
-                            <select  value={currentEmployeInfo[key]}
-                                    name='POST_ID'
-                                    onChange={
-                                        (e) => {
-                                            setEmployeInfo({...currentEmployeInfo,[e.target.name]:e.target.value})
-                                        }
-                                    }>
-                                {selectOptions.map(({ID, POST_NAME}) => {
-                                    return <option key = {ID}
-                                                value = {ID}>
-                                                {POST_NAME}
-                                            </option>
-                                })}
-                            </select>
                             </label>))
                             }
                         )
                     }
                 </fieldset>
                 <div className={style.ButtonBlock}>
-                    <button onClick={(e) => {
-                        e.preventDefault();
-                        (async() => {
-                            try{
-                                const res = await fetch(`https://meet-manager-backend.herokuapp.com/api/employes/${+employeInfo.ID}`,
-                                {
-                                    method:'PUT',
-                                    headers:{
-                                        'Content-type':'application/json'
-                                    },
-                                    body: JSON.stringify(currentEmployeInfo)
-                                })
-                                console.log(res);
-                            }
-                            catch(e){
-                                alert('что-то пошло не так')
-                            }
-                            finally{
-                                router.push('/employes')
-                            }
-
-                        })()
-                    }}>Send</button>
+                    <button onClick={ clickSendHandler}>Send</button>
                     <button>Cancel</button>
                 </div>
             </form>
@@ -94,10 +86,10 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
 
 export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
-    const selectRes = await fetch('https://meet-manager-backend.herokuapp.com/api/posts');
-    const empRes = await fetch(`https://meet-manager-backend.herokuapp.com/api/employes/${id}`);
-    const selectOptions = await selectRes.json();
-    const employeInfo = (await empRes.json())[0];
+    const selectOptions = await PostAPI.getPosts();
+    const employeInfo = await EmployeAPI.getEmployeById(id as string);
+    console.log(selectOptions)
+    console.log(employeInfo)
 
     return {
         props: {

@@ -8,6 +8,7 @@ export interface IEmployeInfo {
     ADDRESS: string,
     EMAIL: string,
     PHONE: string,
+    POST_NAME:string
 }
 
 export interface IEmployeResonseData extends IEmployeInfo {

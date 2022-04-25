@@ -2,7 +2,6 @@ import { DetailedHTMLProps, HTMLAttributes, ReactElement } from "react";
 import cn from 'classnames';
 import style from './Header.module.scss';
 import { ExtendedLink } from '../../../Components/ExtendedLink/ExtendedLink';
-import Logo from '../../../media/logo.svg';
 
 
 export interface IHeaderProps extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>{

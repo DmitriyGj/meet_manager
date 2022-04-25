@@ -1,4 +1,5 @@
 import {baseURL} from '../constants';
+import { IEmploye } from '../types/Employe.model';
 
 class EmployeAPI {
     
@@ -16,7 +17,7 @@ class EmployeAPI {
         }
     }
     
-    getEmployeById = async (id:string) => {
+    getEmployeById = async (id:string): Promise<IEmploye | undefined> => {
         try{
             const res = await fetch(`${this.baseURL}/${id}`);
             const parsedData = await res.json();

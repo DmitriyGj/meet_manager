@@ -5,6 +5,8 @@ import Button  from '@mui/material/Button'
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
+import { IEmploye } from '../../public/src/types/Employe.model';
+import translatorFieldsToRULabels from '../../public/src/utils/translatorToRU';
 
 interface IEmployesPage {
     rows:  GridRowsProp | any
@@ -75,9 +77,15 @@ const Employes = ({rows, columns} : IEmployesPage) => {
 
 export const getServerSideProps: GetServerSideProps  = async ( ) => {
         try{
-            const data = await EmployeAPI.getEmployes();
-            const columns = Object.keys(data[0]).map((col: string) =>( {field:col, headerName:col, width:150}));
-            const rows = data.map((item: any) => ({id: item.ID, ...item}))
+            const data: IEmploye[] = await EmployeAPI.getEmployes();
+            const columns:GridColDef[] = []
+            Object.keys(data[0]).forEach((col: string) =>{
+                if(!col.includes('_ID')){
+                    columns.push({field:col, headerName: translatorFieldsToRULabels.Employe[col], width:150})
+                }
+            });
+            const rows = data.map((item) => ({id: item.ID, ...item}))
+            console.log(data)
             return { props: 
                     {rows , columns} 
                 };

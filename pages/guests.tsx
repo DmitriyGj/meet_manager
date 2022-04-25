@@ -19,11 +19,11 @@ const columns: GridColDef[] = [
 
 const Guests: NextPage = () => {
     useEffect(() => {
-        (async () => {
-        const data = await EmployeAPI.getEmployes()
-        console.log(data)
-        })()
-    }
+            (async () => {
+            const data = await EmployeAPI.getEmployes()
+            console.log(data)
+            })()
+        }
     )
 
     return (<div className={styles.container}>

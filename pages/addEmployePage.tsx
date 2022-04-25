@@ -6,6 +6,7 @@ import EmployeAPI from '../public/src/API/EmployeAPI';
 import PostAPI  from '../public/src/API/PostAPI';
 import InitValues from '../public/src/utils/initValues';
 import { IPost } from "../public/src/types/Post.model";
+import translatorFieldsToRULabels from "../public/src/utils/translatorToRU";
 
 interface AddEmployePageProps {
     employeFields:{
@@ -47,15 +48,14 @@ const AddEmployePage = ({employeFields, selectOptions}: AddEmployePageProps) => 
         <div>
             <form className={style.Form}>
                 <fieldset>
-                    {Object.keys(employeFields).map((prop,index) =>  
-                    <label  key={prop} >{prop}
+                    {Object.keys(employeFields).map((prop) =>  
+                    <label  key={prop} >{translatorFieldsToRULabels.Employe[prop]}
                         {prop != 'POST_ID' ?
                             <input  onChange= {inputChangeHandler}
                                 name={prop} 
                                 type='text'/> 
                             :
-                            <select 
-                                    name='POST_ID'
+                            <select name='POST_ID'
                                     onChange={onchangeSelectHandler}>
                                 {selectOptions.map(({ID, POST_NAME}) => {
                                     return <option key = {ID}

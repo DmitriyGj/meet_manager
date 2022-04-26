@@ -5,11 +5,17 @@ class EmployeAPI {
     
     baseURL = `${baseURL}/api/employes`;
     
-    getEmployes = async () => {
+    getEmployes = async (token: string) => {
         try{
-            const res = await fetch(`${this.baseURL}`);
+            const res = await fetch(`${this.baseURL}`,{
+                method:'GET',
+                headers:{
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                }
+            });
+            console.log(res)
             const parsedData = await res.json();
-            console.log(parsedData)
             return parsedData;
         }
         catch(e) {

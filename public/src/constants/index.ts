@@ -1,3 +1,3 @@
 import { baseURL } from "./api.consts";
-
-export { baseURL}
+import { cookieOptions } from "./Cookie.consts";
+export { baseURL, cookieOptions}

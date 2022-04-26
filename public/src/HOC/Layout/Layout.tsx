@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import style from './Layout.module.scss'
 import { Header } from './Header/Header';
 import { Footer } from './Footer/Footer';
@@ -10,6 +10,12 @@ interface ILayoutProps {
 }
 
 export const Layout = ({children} : ILayoutProps ) => {
+    const [showNav, setShowNav ] = useState(); 
+
+    useEffect(() => {
+
+    });
+
     return(<div className={style.Layout}>
         <Header logo = {<Logo/>}className = { style.Header } />
             <div className = { style.Body } >
@@ -17,8 +23,8 @@ export const Layout = ({children} : ILayoutProps ) => {
             </div>
         <Footer logo = {<Logo/>} className = { style.Footer }>
             <div>
-                <ExtendedLink title={`VK: ${'https://vk.com/mylighting'}`} href={'https://vk.com/mylighting'}/>
-                <ExtendedLink title={`TG: ${'https://t.me/dritmiy_milyutin'}`} href={'https://t.me/dritmiy_milyutin'}/>
+                <ExtendedLink title={`VK`} href={'https://vk.com/mylighting'}/>
+                <ExtendedLink title={`TG`} href={'https://t.me/dritmiy_milyutin'}/>
             </div>
         </Footer>
     </div>)

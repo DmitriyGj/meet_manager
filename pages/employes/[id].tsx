@@ -88,8 +88,6 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
     const selectOptions = await PostAPI.getPosts();
     const employeInfo = await EmployeAPI.getEmployeById(id as string);
-    console.log(selectOptions)
-    console.log(employeInfo)
 
     return {
         props: {

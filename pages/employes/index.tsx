@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
 import { IEmploye } from '../../public/src/types/Employe.model';
 import translatorFieldsToRULabels from '../../public/src/utils/translatorToRU';
+import {getCookie} from 'cookies-next';
 
 interface IEmployesPage {
     rows:  GridRowsProp | any
@@ -75,17 +76,34 @@ const Employes = ({rows, columns} : IEmployesPage) => {
     )
 }
 
-export const getServerSideProps: GetServerSideProps  = async ( ) => {
+export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
         try{
-            const data: IEmploye[] = await EmployeAPI.getEmployes();
+            const {req,res} = ctx;
+            const token = getCookie('token',{req,res});
+            if(!token){
+                return {
+                    redirect: {
+                        destination: '/login',
+                        permanent:false,
+                    }
+                } 
+            }
+            const data = await EmployeAPI.getEmployes(token as string);
+            if(data.status === 403){
+                return {
+                    redirect: {
+                        destination: '/login',
+                        permanent:false,
+                    }
+                }
+            }
             const columns:GridColDef[] = []
             Object.keys(data[0]).forEach((col: string) =>{
                 if(!col.includes('_ID')){
                     columns.push({field:col, headerName: translatorFieldsToRULabels.Employe[col], width:150})
                 }
             });
-            const rows = data.map((item) => ({id: item.ID, ...item}))
-            console.log(data)
+            const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
             return { props: 
                     {rows , columns} 
                 };

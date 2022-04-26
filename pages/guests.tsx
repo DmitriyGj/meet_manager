@@ -18,14 +18,6 @@ const columns: GridColDef[] = [
 ];
 
 const Guests: NextPage = () => {
-    useEffect(() => {
-            (async () => {
-            const data = await EmployeAPI.getEmployes()
-            console.log(data)
-            })()
-        }
-    )
-
     return (<div className={styles.container}>
             <h1>Гости</h1>
             <DataGrid rows={rows} columns={columns} />

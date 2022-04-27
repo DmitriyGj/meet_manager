@@ -1,7 +1,14 @@
 import { useRouter } from "next/router";
 import { ChangeEventHandler, MouseEventHandler, useState } from "react";
 import AuthAPI from "../public/src/API/AuthAPI";
-import { setCookies } from 'cookies-next'
+import { setCookies } from 'cookies-next';
+import FormControl from '@mui/material/FormControl';
+import Button from '@mui/material/Button';
+import InputBase from '@mui/material/InputBase'
+import Input from '@mui/material/Input';
+import InputLabel from "@mui/material/InputLabel";
+import style from '../public/src/Components/Froms/Login.module.scss'
+import { FormGroup, FormLabel, TextField } from "@mui/material";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -24,31 +31,40 @@ const LoginPage = () => {
 
     }
     
-    return(<form>
-                <fieldset>
-                    <label htmlFor="LOGIN">
+    return(
+        <div className={style.main}>
+            <FormControl className={style.Form}>
+                <FormGroup>
+                    <FormLabel className={style.label}
+                        htmlFor="LOGIN">
                         Login
-                    </label>
-                    <input id='LOGIN' 
+                        <TextField className={style.input} 
+                            id='LOGIN' 
                             name="LOGIN" 
                             type="text" 
                             onChange={changeInputHandler} 
                             value={userInfo.LOGIN} />
-                </fieldset>
-                <fieldset>
-                    <label htmlFor="PASSWORD">
+                    </FormLabel>
+
+                </FormGroup>
+                <FormGroup>
+                    <FormLabel className={style.label}
+                        htmlFor="PASSWORD">
                         Password
-                    </label>
-                    <input id='PASSWORD' 
+                        <TextField className={style.input}
+                            id='PASSWORD' 
                             name="PASSWORD" 
-                            type="text" 
+                            type="password" 
                             onChange={changeInputHandler} 
                             value={userInfo.PASSWORD} />
-                </fieldset>
-                <fieldset>
-                    <button onClick={clickLoginHandler}>Login</button>
-                </fieldset>
-            </form>)
+                    </FormLabel>
+
+                </FormGroup>
+                <FormGroup>
+                <   Button fullWidth variant='contained' onClick={clickLoginHandler}>Login</Button>
+                </FormGroup>
+            </FormControl>
+            </div>)
 }
 
 export default LoginPage;

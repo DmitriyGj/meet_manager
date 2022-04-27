@@ -1,0 +1,25 @@
+.main{ 
+    display: flex;
+    margin:auto;
+    width: 50%;
+    justify-content: center;
+    padding: 2%;
+
+    .Form {
+        background-color:rgb(138, 138, 138);
+        padding: 2%;
+        & > * {
+            margin: 5% auto;
+        }
+        
+        .label{
+            display: flex;
+            flex-direction: column;
+            color:white;
+            .input {
+                margin: 5%;
+                color:white
+            }
+        }
+    }
+}

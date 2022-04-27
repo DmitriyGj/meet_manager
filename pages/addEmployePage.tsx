@@ -7,6 +7,7 @@ import PostAPI  from '../public/src/API/PostAPI';
 import InitValues from '../public/src/utils/initValues';
 import { IPost } from "../public/src/types/Post.model";
 import translatorFieldsToRULabels from "../public/src/utils/translatorToRU";
+import { getCookie } from "cookies-next";
 
 interface AddEmployePageProps {
     employeFields:{
@@ -29,7 +30,8 @@ const AddEmployePage = ({employeFields, selectOptions}: AddEmployePageProps) => 
     const addClickHandler: MouseEventHandler = (e) =>  {
         (async() => {
             try{
-                EmployeAPI.addEmploye(employeInfo);
+                const token = getCookie('token')
+                await EmployeAPI.addEmploye(employeInfo, token as string);
             }
             catch(e){
                 alert('что-то пошло не так');

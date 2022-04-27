@@ -25,7 +25,8 @@ const Employes = ({rows, columns, ROLE_ID} : IEmployesPage) => {
         (async () => {
             try{
                 if(selectedRow){
-                    await EmployeAPI.removeEmploye(selectedRow.toString());
+                    const token = getCookie('token');
+                    await EmployeAPI.removeEmploye(selectedRow.toString(), token as string);
                 }
                 else{
                     alert('Выберите запись');
@@ -64,7 +65,9 @@ const Employes = ({rows, columns, ROLE_ID} : IEmployesPage) => {
                                                 }}>Удалить</Button>
                 <Button onClick={
                     () => {
-                        router.push(`/employes/${selectedRow}`)
+                        if(selectedRow){
+                            router.push(`/employes/${selectedRow}`)
+                        }
                     }
                 }
                     variant='contained'style={{borderRadius: 35,

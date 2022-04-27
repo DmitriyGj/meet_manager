@@ -5,6 +5,7 @@ import style from './addEmploye.module.scss';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
 import PostAPI from "../../public/src/API/PostAPI";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
+import { getCookie } from "cookies-next";
 
 interface EditEmployePageProps {
     employeInfo:{
@@ -27,7 +28,8 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
         e.preventDefault();
         (async() => {
             try{
-                await EmployeAPI.editEmploye(+employeInfo.ID, currentEmployeInfo);
+                const token = getCookie('token')
+                await EmployeAPI.editEmploye(+employeInfo.ID, currentEmployeInfo,token as string);
             }
             catch(e){
                 alert('что-то пошло не так')
@@ -86,8 +88,10 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
 
 export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
+    const {req, res} = ctx;
     const selectOptions = await PostAPI.getPosts();
-    const employeInfo = await EmployeAPI.getEmployeById(id as string);
+    const token = getCookie('token',{req,res});
+    const employeInfo = await EmployeAPI.getEmployeById(id as string, token as string);
 
     return {
         props: {

@@ -22,9 +22,15 @@ class EmployeAPI {
         }
     }
     
-    getEmployeById = async (id:string): Promise<IEmploye | undefined> => {
+    getEmployeById = async (id:string, token:string): Promise<IEmploye | undefined> => {
         try{
-            const res = await fetch(`${this.baseURL}/${id}`);
+            const res = await fetch(`${this.baseURL}/${id}`,{
+                method:'GET',
+                headers:{
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                }
+            });
             const parsedData = await res.json();
             return parsedData;
         }
@@ -33,13 +39,14 @@ class EmployeAPI {
         }
     } 
     
-    removeEmploye = async (id:string) => {
+    removeEmploye = async (id:string, token:string) => {
         try{
             const res = await fetch(`${this.baseURL}/${id}`,
                 {
                     method:'DELETE',
                     headers:{
-                        'Content-Type': 'application/json;charset=utf-8'
+                        'Content-Type': 'application/json;charset=utf-8',
+                        'Authorization': token
                     },
                     body: JSON.stringify({id})
                 });
@@ -49,13 +56,14 @@ class EmployeAPI {
         }
     }
 
-    addEmploye = async (employeInfo: any) => {
+    addEmploye = async (employeInfo: any, token:string) => {
         try {
             const res = await fetch(`${this.baseURL}`,
             {
                 method:'POST',
                 headers:{
-                    'Content-type':'application/json'
+                    'Content-type':'application/json',
+                    'Authoriztion':token
                 },
                 body: JSON.stringify(employeInfo)
             })
@@ -65,13 +73,14 @@ class EmployeAPI {
         }
     }
 
-    editEmploye = async (employeId: number, data: any)=> {
+    editEmploye = async (employeId: number, data: any, token: string)=> {
         try{
             const res = await fetch(`${this.baseURL}/${employeId}`,
             {
                 method:'PUT',
                 headers:{
-                    'Content-type':'application/json'
+                    'Content-type':'application/json',
+                    'Authoriztion':token
                 },
                 body: JSON.stringify(data)
             })

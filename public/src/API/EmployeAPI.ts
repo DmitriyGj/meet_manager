@@ -14,7 +14,6 @@ class EmployeAPI {
                     'Authorization': token
                 }
             });
-            console.log(res)
             const parsedData = await res.json();
             return parsedData;
         }

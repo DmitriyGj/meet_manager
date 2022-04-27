@@ -8,13 +8,15 @@ import EmployeAPI from '../../public/src/API/EmployeAPI';
 import { IEmploye } from '../../public/src/types/Employe.model';
 import translatorFieldsToRULabels from '../../public/src/utils/translatorToRU';
 import {getCookie} from 'cookies-next';
+import jwt from 'jwt-decode';
 
 interface IEmployesPage {
     rows:  GridRowsProp | any
     columns: GridColDef[] | any
+    ROLE_ID: number
 }
 
-const Employes = ({rows, columns} : IEmployesPage) => {
+const Employes = ({rows, columns, ROLE_ID} : IEmployesPage) => {
     const router = useRouter();
     const gridRef = useRef<any>(null);
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
@@ -45,7 +47,7 @@ const Employes = ({rows, columns} : IEmployesPage) => {
                         setSelectedRow(+e[0]);
                     }} 
                 rows={rows} columns={columns} />
-            <div className = {styles.ButtonContainer}>
+            {!ROLE_ID && <div className = {styles.ButtonContainer}>
                 <Button variant='contained' onClick={()=>router.push('/addEmployePage')}
                                             style={{borderRadius: 35,
                                                     backgroundColor: "gray",
@@ -71,7 +73,7 @@ const Employes = ({rows, columns} : IEmployesPage) => {
                                                     width: '10%',
                                                     margin: '0% 1%'
                                                 }} >Изменить</Button>
-                </div>
+                </div>}
         </div>
     )
 }
@@ -97,6 +99,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                     }
                 }
             }
+            const {role} = jwt(token as string) as {role: number};
             const columns:GridColDef[] = []
             Object.keys(data[0]).forEach((col: string) =>{
                 if(!col.includes('_ID')){
@@ -105,7 +108,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
             });
             const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
             return { props: 
-                    {rows , columns} 
+                    {rows , columns, ROLE_ID: role } 
                 };
         }
         catch(e){

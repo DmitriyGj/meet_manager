@@ -14,7 +14,7 @@ class AuthAPI {
         try{
             const res = await fetch(`${this.baseURL}`,{
                 method:'POST',
-                mode:'cors',
+                mode:'no-cors',
                 headers:{
                     'Content-Type':'application/json',
                                     },

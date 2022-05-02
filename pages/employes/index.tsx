@@ -1,32 +1,104 @@
 import type { GetServerSideProps } from 'next'
 import styles from '../../styles/Home.module.css'
-import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
+import { DataGrid, GridApi, GridColDef, GridColumnMenuContainer, GridColumnMenuProps, GridExportMenuItemProps, gridFilteredSortedRowIdsSelector, GridRowsProp, GridToolbarContainer, GridToolbarExport, GridToolbarExportContainer, gridVisibleColumnFieldsSelector, SortGridMenuItems, useGridApiContext } from '@mui/x-data-grid'
 import Button  from '@mui/material/Button'
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef,  useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
 import { IEmploye } from '../../public/src/types/Employe.model';
 import translatorFieldsToRULabels from '../../public/src/utils/translatorToRU';
-import {getCookie} from 'cookies-next';
-import jwt from 'jwt-decode';
+import { ExcelExport } from '@progress/kendo-react-excel-export';
+import { ButtonProps} from '@mui/material/Button';
 
+import {getCookie} from 'cookies-next';
+import style from './employesPage.module.scss'
+import { MenuItem } from '@mui/material';
 interface IEmployesPage {
     rows:  GridRowsProp | any
     columns: GridColDef[] | any
-    ROLE_ID: number
+    token: string
 }
 
-const Employes = ({rows, columns, ROLE_ID} : IEmployesPage) => {
+const CustomExportButton = (props: ButtonProps) => 
+    (<GridToolbarExportContainer {...props}>
+        <ExcelExportMenuItem/>
+    </GridToolbarExportContainer>)
+
+const CustomToolbar = () => 
+    (<GridToolbarContainer className={style.Toolbar}>
+        <CustomExportButton className={style.ExportBtn} />
+    </GridToolbarContainer>)
+
+const getExcel = (apiRef: React.MutableRefObject<GridApi>) => {
+    const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
+    const visibleColumnsField = gridVisibleColumnFieldsSelector(apiRef);
+    const data = filteredSortedRowIds.map((id) => {
+        const row: Record<string, any> = {};
+        visibleColumnsField.forEach((field) => row[translatorFieldsToRULabels.Employe[field]] = apiRef.current.getCellParams(id, field).value);
+        return row;
+    });
+    const parsedColimns = visibleColumnsField.map((field) =>{return {field:translatorFieldsToRULabels.Employe[field], width:150} as GridColDef});
+    return {data, columns: parsedColimns };
+};
+
+const ExcelExportMenuItem = (props: GridExportMenuItemProps<{}>) => {
+    const apiRef = useGridApiContext();
+    const _export = useRef<ExcelExport | null>(null);
+    const excelExport = (rows:any,columns:any) => {
+        if (_export.current !== null) {
+            console.log(rows,columns)
+            _export.current.save(rows,columns);
+        }
+    };
+
+    const { hideMenu } = props;
+
+    return (
+        <MenuItem
+        onClick={() => {
+            const excelData = getExcel(apiRef);
+            console.log(excelData);
+            excelExport(excelData.data, excelData.columns);
+            hideMenu?.();
+        }}
+        >
+            <ExcelExport ref={_export}>
+                Export Excel
+            </ExcelExport>
+        </MenuItem>
+    );
+    };
+
+const GridColumnMenu = forwardRef<
+                    HTMLUListElement,
+                    GridColumnMenuProps
+                    >(function GridColumnMenu(props: GridColumnMenuProps, ref) {
+                    const { hideMenu, currentColumn } = props;
+
+                    return (
+                        <GridColumnMenuContainer ref={ref} {...props}>
+                            <SortGridMenuItems onClick={hideMenu} column={currentColumn!} />
+                        </GridColumnMenuContainer>
+                        );
+                    });
+
+
+
+const Employes = ({rows, columns, token} : IEmployesPage) => {
     const router = useRouter();
     const gridRef = useRef<any>(null);
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
-
+    const _export = useRef<ExcelExport | null>(null);
+    const excelExport = (rows:any,columns:any) => {
+        if (_export.current !== null) {
+            _export.current.save(rows,columns);
+        }
+    };
     const clickRemoveHandler = () =>{
         (async () => {
             try{
                 if(selectedRow){
-                    const token = getCookie('token');
-                    await EmployeAPI.removeEmploye(selectedRow.toString(), token as string);
+                    await EmployeAPI.removeEmploye(selectedRow.toString(), token);
                 }
                 else{
                     alert('Выберите запись');
@@ -43,12 +115,17 @@ const Employes = ({rows, columns, ROLE_ID} : IEmployesPage) => {
 
     return (<div className={styles.container}>
             <h1>Работники</h1>
-            <DataGrid ref={gridRef} 
-                onSelectionModelChange={(e) => {
-                        setSelectedRow(+e[0]);
-                    }} 
-                rows={rows} columns={columns} />
-            {!ROLE_ID && <div className = {styles.ButtonContainer}>
+            <ExcelExport ref={_export}>
+                <Button onClick={() => {console.log(rows,columns); excelExport(rows,columns)}}>sss</Button>
+            </ExcelExport>
+                <DataGrid components={{Toolbar: CustomToolbar, ColumnMenu: GridColumnMenu}} 
+                    ref={gridRef} 
+                    onSelectionModelChange={(e) => {
+                            setSelectedRow(+e[0]);
+                        }} 
+                    rows={rows} columns={columns} />
+
+            <div className = {styles.ButtonContainer}>
                 <Button variant='contained' onClick={()=>router.push('/addEmployePage')}
                                             style={{borderRadius: 35,
                                                     backgroundColor: "gray",
@@ -65,9 +142,7 @@ const Employes = ({rows, columns, ROLE_ID} : IEmployesPage) => {
                                                 }}>Удалить</Button>
                 <Button onClick={
                     () => {
-                        if(selectedRow){
-                            router.push(`/employes/${selectedRow}`)
-                        }
+                        router.push(`/employes/${selectedRow}`)
                     }
                 }
                     variant='contained'style={{borderRadius: 35,
@@ -76,7 +151,7 @@ const Employes = ({rows, columns, ROLE_ID} : IEmployesPage) => {
                                                     width: '10%',
                                                     margin: '0% 1%'
                                                 }} >Изменить</Button>
-                </div>}
+                </div>
         </div>
     )
 }
@@ -102,7 +177,6 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                     }
                 }
             }
-            const {role} = jwt(token as string) as {role: number};
             const columns:GridColDef[] = []
             Object.keys(data[0]).forEach((col: string) =>{
                 if(!col.includes('_ID')){
@@ -111,7 +185,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
             });
             const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
             return { props: 
-                    {rows , columns, ROLE_ID: role } 
+                    {rows , columns, token} 
                 };
         }
         catch(e){

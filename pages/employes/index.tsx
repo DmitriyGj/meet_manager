@@ -115,15 +115,13 @@ const Employes = ({rows, columns, token} : IEmployesPage) => {
 
     return (<div className={styles.container}>
             <h1>Работники</h1>
-            <ExcelExport ref={_export}>
-                <Button onClick={() => {console.log(rows,columns); excelExport(rows,columns)}}>sss</Button>
-            </ExcelExport>
-                <DataGrid components={{Toolbar: CustomToolbar, ColumnMenu: GridColumnMenu}} 
-                    ref={gridRef} 
-                    onSelectionModelChange={(e) => {
-                            setSelectedRow(+e[0]);
-                        }} 
-                    rows={rows} columns={columns} />
+
+            <DataGrid components={{Toolbar: CustomToolbar, ColumnMenu: GridColumnMenu}} 
+                ref={gridRef} 
+                onSelectionModelChange={(e) => {
+                        setSelectedRow(+e[0]);
+                    }} 
+                rows={rows} columns={columns} />
 
             <div className = {styles.ButtonContainer}>
                 <Button variant='contained' onClick={()=>router.push('/addEmployePage')}

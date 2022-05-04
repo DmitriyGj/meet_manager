@@ -1,18 +1,16 @@
-import { BarInfo } from '../Components/Charts/EmployeChart/EmployeChart';
 import {baseURL} from '../constants';
 import { IEmploye } from '../types/Employe.model';
 
-class EmployeAPI {
+class MeetingsAPI {
     
-    baseURL = `${baseURL}/api/employes`;
+    baseURL = `${baseURL}/api/meetings`;
     
-    getEmployes = async (token: string) => {
+    getMeetings= async ( ) => {
         try{
             const res = await fetch(`${this.baseURL}`,{
                 method:'GET',
                 headers:{
                     'Content-Type': 'application/json',
-                    'Authorization': token
                 }
             });
             const parsedData = await res.json();
@@ -23,13 +21,12 @@ class EmployeAPI {
         }
     }
     
-    getEmployeById = async (id:string, token:string): Promise<IEmploye | undefined> => {
+    getMeetingById = async (id:string): Promise<IEmploye | undefined> => {
         try{
             const res = await fetch(`${this.baseURL}/${id}`,{
                 method:'GET',
                 headers:{
                     'Content-Type': 'application/json',
-                    'Authorization': token
                 }
             });
             const parsedData = await res.json();
@@ -40,14 +37,13 @@ class EmployeAPI {
         }
     } 
     
-    removeEmploye = async (id:string, token:string) => {
+    removeMeeting = async (id:string) => {
         try{
             const res = await fetch(`${this.baseURL}/${id}`,
                 {
                     method:'DELETE',
                     headers:{
                         'Content-Type': 'application/json;charset=utf-8',
-                        'Authorization': token
                     },
                     body: JSON.stringify({id})
                 });
@@ -57,14 +53,13 @@ class EmployeAPI {
         }
     }
 
-    addEmploye = async (employeInfo: any, token:string) => {
+    addMeeting = async (employeInfo: any) => {
         try {
             const res = await fetch(`${this.baseURL}`,
             {
                 method:'POST',
                 headers:{
                     'Content-type':'application/json',
-                    'Authoriztion':token
                 },
                 body: JSON.stringify(employeInfo)
             })
@@ -74,14 +69,13 @@ class EmployeAPI {
         }
     }
 
-    editEmploye = async (employeId: number, data: any, token: string)=> {
+    editMeeting = async (employeId: number, data: any)=> {
         try{
             const res = await fetch(`${this.baseURL}/${employeId}`,
             {
                 method:'PUT',
                 headers:{
                     'Content-type':'application/json',
-                    'Authoriztion':token
                 },
                 body: JSON.stringify(data)
             })
@@ -92,16 +86,6 @@ class EmployeAPI {
 
     }
 
-    getEmployeChartInfo = async() : Promise<BarInfo[] | undefined>  => {
-        try {
-            const res = await fetch(`${this.baseURL}_chart`);
-            const parsedData = await res.json();
-            return parsedData;
-        }
-        catch(e){
-            console.log(e);
-        }
-    }
 }
 
-export default new EmployeAPI();
+export default new MeetingsAPI();

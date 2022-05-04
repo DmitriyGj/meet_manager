@@ -9,10 +9,13 @@ import { IEmploye } from '../../public/src/types/Employe.model';
 import translatorFieldsToRULabels from '../../public/src/utils/translatorToRU';
 import { ExcelExport } from '@progress/kendo-react-excel-export';
 import { ButtonProps} from '@mui/material/Button';
-
+import EmployeChart, { BarInfo } from '../../public/src/Components/Charts/EmployeChart/EmployeChart'
+import ShowChart from '@mui/icons-material/ShowChart'
 import {getCookie} from 'cookies-next';
 import style from './employesPage.module.scss'
 import { MenuItem } from '@mui/material';
+import {ModalWindow} from '../../public/src/Components/ModalWindow//ModalWindow'
+
 interface IEmployesPage {
     rows:  GridRowsProp | any
     columns: GridColDef[] | any
@@ -24,10 +27,7 @@ const CustomExportButton = (props: ButtonProps) =>
         <ExcelExportMenuItem/>
     </GridToolbarExportContainer>)
 
-const CustomToolbar = () => 
-    (<GridToolbarContainer className={style.Toolbar}>
-        <CustomExportButton className={style.ExportBtn} />
-    </GridToolbarContainer>)
+
 
 const getExcel = (apiRef: React.MutableRefObject<GridApi>) => {
     const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
@@ -67,7 +67,7 @@ const ExcelExportMenuItem = (props: GridExportMenuItemProps<{}>) => {
             </ExcelExport>
         </MenuItem>
     );
-    };
+};
 
 const GridColumnMenu = forwardRef<
                     HTMLUListElement,
@@ -82,18 +82,30 @@ const GridColumnMenu = forwardRef<
                         );
                     });
 
-
-
 const Employes = ({rows, columns, token} : IEmployesPage) => {
     const router = useRouter();
     const gridRef = useRef<any>(null);
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
-    const _export = useRef<ExcelExport | null>(null);
-    const excelExport = (rows:any,columns:any) => {
-        if (_export.current !== null) {
-            _export.current.save(rows,columns);
+    const [showStats, setShowStats] = useState(false);
+    const [chartInfo, setChartInfo] = useState<BarInfo[]>([]);
+
+    const clickStatsHandler = () => {
+        (async() => {
+            const chartInfoRes = await EmployeAPI.getEmployeChartInfo();
+            setChartInfo(chartInfoRes || []);
+        })()
+        setShowStats(true);
+    }
+
+    const clickChangeHandler = () => {
+        if(selectedRow){
+            router.push(`/employes/${selectedRow}`)
+        } 
+        else{
+            alert('Выберите запись');
         }
-    };
+    }
+
     const clickRemoveHandler = () =>{
         (async () => {
             try{
@@ -113,10 +125,23 @@ const Employes = ({rows, columns, token} : IEmployesPage) => {
         })();
     }
 
+    const CustomToolbar = () => 
+    (<GridToolbarContainer className={style.Toolbar}>
+        <CustomExportButton className={style.ExportBtn} />
+        <Button onClick={clickStatsHandler} className={style.ExportBtn}><ShowChart/> Stats</Button>
+    </GridToolbarContainer>)
+
     return (<div className={styles.container}>
             <h1>Работники</h1>
-
-            <DataGrid components={{Toolbar: CustomToolbar, ColumnMenu: GridColumnMenu}} 
+            {showStats &&
+                <ModalWindow title='Статистик' visible={showStats} onClose={() => {
+                    setChartInfo([]);
+                    setShowStats(false);
+                }}>
+                    <EmployeChart title ='Количество встреч' dataset={chartInfo}/>
+                </ModalWindow> }
+            <DataGrid components={{Toolbar: CustomToolbar, 
+                                    ColumnMenu: GridColumnMenu}} 
                 ref={gridRef} 
                 onSelectionModelChange={(e) => {
                         setSelectedRow(+e[0]);
@@ -124,11 +149,11 @@ const Employes = ({rows, columns, token} : IEmployesPage) => {
                 rows={rows} columns={columns} />
 
             <div className = {styles.ButtonContainer}>
-                <Button variant='contained' onClick={()=>router.push('/addEmployePage')}
+                <Button variant='contained' onClick={()=>router.push(`${router.asPath}/add`)}
                                             style={{borderRadius: 35,
                                                     backgroundColor: "gray",
                                                     fontSize: "14px",
-                                                    width: '10%',
+                                                    width: '8%',
                                                     margin: '0% 1%'
                                                 }}>Добавить</Button>
                 <Button variant='contained' onClick={clickRemoveHandler}
@@ -138,11 +163,7 @@ const Employes = ({rows, columns, token} : IEmployesPage) => {
                                                     width: '10%',
                                                     margin: '0% 1%'
                                                 }}>Удалить</Button>
-                <Button onClick={
-                    () => {
-                        router.push(`/employes/${selectedRow}`)
-                    }
-                }
+                <Button onClick={clickChangeHandler}
                     variant='contained'style={{borderRadius: 35,
                                                     backgroundColor: "gray",
                                                     fontSize: "14px",
@@ -167,6 +188,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                 } 
             }
             const data = await EmployeAPI.getEmployes(token as string);
+            console.log(data)
             if(data.status === 403){
                 return {
                     redirect: {

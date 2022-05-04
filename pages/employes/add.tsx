@@ -1,12 +1,12 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { ChangeEvent, FormEvent, MouseEventHandler, useState } from "react";
+import { ChangeEvent,  MouseEventHandler, useState } from "react";
 import style from './addEmploye.module.scss';
-import EmployeAPI from '../public/src/API/EmployeAPI';
-import PostAPI  from '../public/src/API/PostAPI';
-import InitValues from '../public/src/utils/initValues';
-import { IPost } from "../public/src/types/Post.model";
-import translatorFieldsToRULabels from "../public/src/utils/translatorToRU";
+import EmployeAPI from '../../public/src/API/EmployeAPI';
+import PostAPI  from '../../public/src/API/PostAPI';
+import InitValues from '../../public/src/utils/initValues';
+import { IPost } from "../../public/src/types/Post.model";
+import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
 
 interface AddEmployePageProps {

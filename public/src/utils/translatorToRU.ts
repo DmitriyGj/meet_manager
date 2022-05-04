@@ -14,6 +14,12 @@ const translatorFieldsToRULabels: Buffer<Buffer<string>> = {
     'EMAIL' : 'Email',
     'PHONE' : 'Номер телефона',
     'DEPART_NAME': 'Подразделение'
-}}
+    },
+    Meeting: {
+        'ID':'ID',
+        'START_DATE':'Начало',
+        'END_DATE':'Конец'
+    }
+}
 
 export default translatorFieldsToRULabels;

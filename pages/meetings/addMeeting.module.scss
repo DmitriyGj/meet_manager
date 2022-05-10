@@ -50,30 +50,19 @@
         }
 
         .inputPicker {
-            div{
-                height: 40px;
-            }
             label {
                 margin-left: -10%;
                 margin-top: -3%;
                 font-size: 20px;
             }
-            fieldset {
-                legend * {
-                    color: white;
-                }
-            }
         }
-
     }
-
-
-
+    .DataGrid {
+        width: 100%;
+    }
+    
 } 
 
-.DataGrid {
-    width: 100%;
-}
 
 
 

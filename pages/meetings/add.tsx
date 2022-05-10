@@ -33,7 +33,6 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
         (async() => {
             try{
                 const res = await MeetingsAPI.addMeeting(meetingInfo,token);
-                console.log(res)
             }
             catch(e){
                 alert('что-то пошло не так');

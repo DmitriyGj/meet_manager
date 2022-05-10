@@ -48,7 +48,6 @@ const ExcelExportMenuItem = (props: GridExportMenuItemProps<{}>) => {
     const _export = useRef<ExcelExport | null>(null);
     const excelExport = (rows:any,columns:any) => {
         if (_export.current !== null) {
-            console.log(rows,columns)
             _export.current.save(rows,columns);
         }
     };
@@ -59,7 +58,6 @@ const ExcelExportMenuItem = (props: GridExportMenuItemProps<{}>) => {
         <MenuItem
         onClick={() => {
             const excelData = getExcel(apiRef);
-            console.log(excelData);
             excelExport(excelData.data, excelData.columns);
             hideMenu?.();
         }}
@@ -186,7 +184,6 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                 } 
             }
             const data = await EmployeAPI.getEmployes(token as string);
-            console.log(data)
             if(data.status === 403){
                 return {
                     redirect: {

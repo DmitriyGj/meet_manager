@@ -42,7 +42,7 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
 
     const router = useRouter();
     return(
-        <div className={style.main}>
+        <div className={style.Main}>
             <FormControl className={style.Form}>
                     {Object.keys(employeInfo).map((prop:string) =>  
                         prop !== 'ID' && <FormLabel className={style.label}  

@@ -42,7 +42,7 @@ const AddEmployePage = ({employeFields, selectOptions, token}: AddEmployePagePro
     }
 
     return(
-        <div className={style.main}>
+        <div className={style.Main}>
             <FormControl className={style.Form}>
                     {Object.keys(employeInfo).map((prop:string) =>  
                         <FormLabel className={style.label}  

@@ -60,7 +60,7 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
                                                 }
                                             }}  
                                             value={meetingInfo.START_DATE} 
-                                            renderInput={(props) => <TextField className={style.input} {...props}/> } />
+                                            renderInput={(props) => <TextField className={style.inputPicker} {...props}/> } />
                             
                             <DateTimePicker label='Конец встречи' 
                                             onChange={(date) => {
@@ -69,7 +69,7 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
                                                 }
                                             }}  
                                             value={meetingInfo.END_DATE} 
-                                            renderInput={(props) => <TextField className={style.input} {...props}/> }/>
+                                            renderInput={(props) => <TextField className={style.inputPicker} {...props}/> }/>
                     </LocalizationProvider>
                     <FormLabel>
                         Участники

@@ -1,18 +1,16 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { MouseEventHandler, useEffect, useState, useRef } from "react";
+import { MouseEventHandler, useState, useRef } from "react";
 import style from './addMeeting.module.scss';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
 import MeetingsAPI from "../../public/src/API/MeetingsAPI";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
 import { DataGrid, GridApi, GridColDef, GridRowId, GridRowsProp } from "@mui/x-data-grid";
-import { DataGridPro  } from '@mui/x-data-grid-pro';
 import { IEmploye } from "../../public/src/types/Employe.model";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { Button, FormControl, FormLabel, TextField } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { useGridApiRef } from '@mui/x-data-grid';
 
 interface IMeeting {
     ID:number
@@ -50,7 +48,7 @@ const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => 
     };
 
 
-    return(<div className={style.main}>
+    return(<div className={style.Main}>
                         <FormControl className={style.Form}>
                                 <LocalizationProvider dateAdapter={AdapterDateFns} >
                                         <DateTimePicker hideTabs

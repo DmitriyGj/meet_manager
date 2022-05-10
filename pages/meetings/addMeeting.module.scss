@@ -7,11 +7,12 @@
     
     .Form{
         display: flex;
+        justify-content: center;
         flex-direction: column;
         width: 80%;
         padding: 0% 10%;
         & > * {
-            margin: 2% 0;
+            margin: 1% 0;
             padding: 0px;
         }
 
@@ -36,12 +37,26 @@
             }
         }
     }
+
+    .PickersBlock{
+        display: flex;
+        width:20%;
+        justify-content: center;
+        flex-direction: column;
+        align-self: center;
+
+        >:not(:last-child){
+            margin-bottom: 10%;
+        }
+    }
+
     .inputPicker {
         div{
+            height: 40px;
         }
         label {
-            margin-left: -2%;
-            margin-top: -0.5%;
+            margin-left: -10%;
+            margin-top: -3%;
             font-size: 20px;
         }
         fieldset {

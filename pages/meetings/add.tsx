@@ -50,6 +50,7 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
     return(
         <div className={style.main}>
             <FormControl className={style.Form}>
+                <div className={style.PickersBlock}>
                     <LocalizationProvider dateAdapter={AdapterDateFns} >
                             <DateTimePicker hideTabs
                                             showTodayButton
@@ -71,6 +72,8 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
                                             value={meetingInfo.END_DATE} 
                                             renderInput={(props) => <TextField className={style.inputPicker} {...props}/> }/>
                     </LocalizationProvider>
+                </div>
+
                     <FormLabel>
                         Участники
                     </FormLabel>

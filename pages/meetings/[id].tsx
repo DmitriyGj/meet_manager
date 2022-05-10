@@ -30,13 +30,9 @@ const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => 
     const [currentMeetingInfo, setCurrentMeetingInfo] = useState(meetingInfo);
 
     const selectEmployeHandler = (e:any[]) =>{
-        console.log(e)
         setCurrentMeetingInfo({...currentMeetingInfo, MEMBERS: e});
     }
 
-    useEffect(() => {
-        console.log(currentMeetingInfo.MEMBERS)
-    })
 
     const clickSendHandler: MouseEventHandler = (e) => {
         e.preventDefault();

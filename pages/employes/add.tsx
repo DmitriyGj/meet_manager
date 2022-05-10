@@ -36,6 +36,7 @@ const AddEmployePage = ({employeFields, selectOptions, token}: AddEmployePagePro
                 alert('что-то пошло не так');
             }
             finally{
+                router.push('/employes')
             }
 
         })()

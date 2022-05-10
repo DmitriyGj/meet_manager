@@ -48,24 +48,26 @@
         >:not(:last-child){
             margin-bottom: 10%;
         }
+
+        .inputPicker {
+            > div{
+                height: 40px;
+            }
+            label {
+                margin-left: -10%;
+                margin-top: -3%;
+                font-size: 20px;
+            }
+            fieldset {
+                legend * {
+                    color: white;
+                }
+            }
+        
+        }
     }
 
-    .inputPicker {
-        div{
-            height: 40px;
-        }
-        label {
-            margin-left: -10%;
-            margin-top: -3%;
-            font-size: 20px;
-        }
-        fieldset {
-            legend * {
-                color: white;
-            }
-        }
-    
-    }
+
 } 
 
 .DataGrid {

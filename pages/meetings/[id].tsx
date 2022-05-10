@@ -27,7 +27,6 @@ interface EditMeetingPageProps {
 
 const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => {
     const router = useRouter();
-    const apiRef = useRef<GridApi>(null);
     const [currentMeetingInfo, setMeetingInfo] = useState(meetingInfo);
 
     const clickSendHandler: MouseEventHandler = (e) => {
@@ -48,8 +47,9 @@ const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => 
     };
 
 
-    return(<div className={style.Main}>
+    return(<div className={style.main}>
                         <FormControl className={style.Form}>
+                            <div className={style.PickersBlock}>
                                 <LocalizationProvider dateAdapter={AdapterDateFns} >
                                         <DateTimePicker hideTabs
                                                         showTodayButton
@@ -60,7 +60,7 @@ const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => 
                                                             }
                                                         }}  
                                                         value={meetingInfo.START_DATE} 
-                                                        renderInput={(props) => <TextField className={style.input} {...props}/> } />
+                                                        renderInput={(props) => <TextField className={style.inputPicker} {...props}/> } />
                                         
                                         <DateTimePicker label='Конец встречи' 
                                                         onChange={(date) => {
@@ -69,8 +69,9 @@ const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => 
                                                             }
                                                         }}  
                                                         value={meetingInfo.END_DATE} 
-                                                        renderInput={(props) => <TextField className={style.input} {...props}/> }/>
+                                                        renderInput={(props) => <TextField className={style.inputPicker} {...props}/> }/>
                                 </LocalizationProvider>
+                            </div>
                                 <FormLabel>
                                     Участники
                                 </FormLabel>

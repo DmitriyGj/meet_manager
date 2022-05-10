@@ -25,7 +25,12 @@ const Meetings = ({rows,columns, token} : IMeetingsPage) => {
     }
 
     const clickChangeHandler = () => {
-        router.push(`${router.asPath}/${selectedRow}`);
+                if(selectedRow){
+            router.push(`${router.asPath}/${selectedRow}`)
+        } 
+        else{
+            alert('Выберите запись');
+        }
     }
 
     const clickRemoveHandler = () => {
@@ -92,7 +97,6 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
             } 
         }
         const data = await MeetingsAPI.getMeetings(token as string);
-        console.log(data)
         if(data.status === 403){
             return {
                 redirect: {

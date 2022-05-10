@@ -36,6 +36,22 @@
             }
         }
     }
+    .input {
+        div{
+            height: 40px;
+        }
+        label {
+            margin-left: -2%;
+            margin-top: -0.5%;
+            font-size: 20px;
+        }
+        fieldset {
+            legend * {
+                color: white;
+            }
+        }
+    
+    }
 } 
 
 .DataGrid {
@@ -43,22 +59,7 @@
 }
 
 
-.input {
-    div{
-        height: 40px;
-    }
-    label {
-        margin-left: -2%;
-        margin-top: -0.5%;
-        font-size: 20px;
-    }
-    fieldset {
-        legend * {
-            color: white;
-        }
-    }
 
-}
 
     
     

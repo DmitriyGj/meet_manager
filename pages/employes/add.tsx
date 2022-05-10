@@ -24,7 +24,7 @@ const AddEmployePage = ({employeFields, selectOptions, token}: AddEmployePagePro
     const inputChangeHandler:ChangeEventHandler<HTMLInputElement> =  ({target}) =>  {
         setEmployeInfo({...employeInfo,[target.name]:target.value})
     };
-    const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...employeInfo,[target.name]:target.value}); console.log(employeInfo)};
+    const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...employeInfo,[target.name]:target.value});};
     
     const addClickHandler: MouseEventHandler = (e) =>  {
         (async() => {

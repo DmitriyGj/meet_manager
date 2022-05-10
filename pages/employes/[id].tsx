@@ -34,7 +34,7 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
         })();
     };
     const inputChangeHandler:ChangeEventHandler<HTMLInputElement> =  ({target}) =>  {
-        setEmployeInfo({...employeInfo,[target.name]:target.value})
+        setEmployeInfo({...currentEmployeInfo,[target.name]:target.value})
     };
 
     const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...employeInfo,[target.name]:target.value}); };
@@ -49,12 +49,12 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
                             key={prop}
                             htmlFor={prop}>
                             {translatorFieldsToRULabels.Employe[prop]}
-                            {prop != 'POST_ID' ?
-                                <TextField className={style.input}  
-                                    onChange= {inputChangeHandler}
-                                    value={currentEmployeInfo[prop]}
-                                    name={prop} 
-                                    type='text'/> 
+                                {prop != 'POST_ID' ?
+                                    <TextField className={style.input}  
+                                        onChange= {inputChangeHandler}
+                                        value={currentEmployeInfo[prop]}
+                                        name={prop} 
+                                        type='text'/> 
                                 :
                                 <Select value={currentEmployeInfo[prop]}
                                         name='POST_ID'

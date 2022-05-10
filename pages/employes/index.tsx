@@ -15,11 +15,13 @@ import {getCookie} from 'cookies-next';
 import style from './employesPage.module.scss'
 import { MenuItem } from '@mui/material';
 import {ModalWindow} from '../../public/src/Components/ModalWindow//ModalWindow'
+import JWT from 'jsonwebtoken';
 
 interface IEmployesPage {
     rows:  GridRowsProp | any
     columns: GridColDef[] | any
     token: string
+    role: number
 }
 
 const CustomExportButton = (props: ButtonProps) => 
@@ -82,7 +84,7 @@ const GridColumnMenu = forwardRef<
                         );
                     });
 
-const Employes = ({rows, columns, token} : IEmployesPage) => {
+const Employes = ({rows, columns, token, role} : IEmployesPage) => {
     const router = useRouter();
     const gridRef = useRef<any>(null);
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
@@ -134,7 +136,7 @@ const Employes = ({rows, columns, token} : IEmployesPage) => {
     return (<div className={styles.container}>
             <h1>Работники</h1>
             {showStats &&
-                <ModalWindow title='Статистик' visible={showStats} onClose={() => {
+                <ModalWindow title='Статистика' visible={showStats} onClose={() => {
                     setChartInfo([]);
                     setShowStats(false);
                 }}>
@@ -147,30 +149,26 @@ const Employes = ({rows, columns, token} : IEmployesPage) => {
                         setSelectedRow(+e[0]);
                     }} 
                 rows={rows} columns={columns} />
-
-            <div className = {styles.ButtonContainer}>
+                { role === 0 && <div className = {styles.ButtonContainer}>
                 <Button variant='contained' onClick={()=>router.push(`${router.asPath}/add`)}
                                             style={{borderRadius: 35,
-                                                    backgroundColor: "gray",
                                                     fontSize: "14px",
                                                     width: '8%',
                                                     margin: '0% 1%'
                                                 }}>Добавить</Button>
                 <Button variant='contained' onClick={clickRemoveHandler}
                                             style={{borderRadius: 35,
-                                                    backgroundColor: "gray",
                                                     fontSize: "14px",
                                                     width: '10%',
                                                     margin: '0% 1%'
                                                 }}>Удалить</Button>
                 <Button onClick={clickChangeHandler}
                     variant='contained'style={{borderRadius: 35,
-                                                    backgroundColor: "gray",
                                                     fontSize: "14px",
                                                     width: '10%',
                                                     margin: '0% 1%'
                                                 }} >Изменить</Button>
-                </div>
+                </div>}
         </div>
     )
 }
@@ -197,6 +195,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                     }
                 }
             }
+            const {role} = JWT.decode(`${token}`) as {role: number};
             const columns:GridColDef[] = []
             Object.keys(data[0]).forEach((col: string) =>{
                 if(!col.includes('_ID')){
@@ -205,7 +204,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
             });
             const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
             return { props: 
-                    {rows , columns, token} 
+                    {rows , columns, token, role} 
                 };
         }
         catch(e){

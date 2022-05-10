@@ -1,7 +1,4 @@
-interface Buffer<T> {
-    [name:string]:T
-}
-
+import {Buffer} from '../types/Buffer';
 const translatorFieldsToRULabels: Buffer<Buffer<string>> = {
     Employe:{
     'ID':'ID',

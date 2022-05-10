@@ -2,14 +2,19 @@
     display: flex;
     margin:auto;
     justify-content: center;
+    height: 100%;
+    width: 100%;
     
     .Form{
         display: flex;
-        width: 50%;
-        padding: 0%;
+        flex-direction: column;
+        width: 80%;
+        padding: 0% 10%;
         & > * {
-            margin: 2% auto;
+            margin: 2% 0;
+            padding: 0px;
         }
+
         
         .label{
             display: flex;
@@ -21,13 +26,39 @@
         }
 
         .ButtonBlock {
-            width: 50%;
             padding: 0;
             display: flex;  
             justify-content: space-around;
             flex-direction: row;
+
+            .Button {
+                margin: auto;
+            }
         }
     }
 } 
+
+.DataGrid {
+    width: 100%;
+}
+
+
+.input {
+    div{
+        height: 40px;
+    }
+    label {
+        margin-left: -2%;
+        margin-top: -0.5%;
+        font-size: 20px;
+    }
+    fieldset {
+        legend * {
+            color: white;
+        }
+    }
+
+}
+
     
     

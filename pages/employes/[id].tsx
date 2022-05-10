@@ -1,23 +1,16 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { ChangeEvent, MouseEventHandler, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, MouseEventHandler, ReactNode, useState } from "react";
 import style from './addEmploye.module.scss';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
 import PostAPI from "../../public/src/API/PostAPI";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
+import { Button, FormControl, FormGroup, FormLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { IEmployeResonseData } from "../../public/src/types/Employe.model";
 
 interface EditEmployePageProps {
-    employeInfo:{
-        ID:string,
-        NAME: string,
-        LAST_NAME: string,
-        PATRONYMIC: string,
-        ADDRESS: string,
-        EMAIL: string,
-        PHONE: string,
-        POST_ID: number
-    },
+    employeInfo:IEmployeResonseData,
     selectOptions: {ID:string, POST_NAME:string}[]
 };
 
@@ -40,48 +33,48 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
 
         })();
     };
-    const changeInputHandler = (key:string) => ({target}:ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setEmployeInfo({...currentEmployeInfo,[key]:target?.value})
-    }
+    const inputChangeHandler:ChangeEventHandler<HTMLInputElement> =  ({target}) =>  {
+        setEmployeInfo({...employeInfo,[target.name]:target.value})
+        console.log(employeInfo)
+    };
 
+    const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...employeInfo,[target.name]:target.value}); console.log(employeInfo)};
     
+
     const router = useRouter();
     return(
-        <div>
-            <form className={style.Form}>
-                <fieldset>
-                    {Object.entries(currentEmployeInfo).map(([key,value]) =>{
-                        return(
-                            (key !== 'ID') && (
-                            <label>{translatorFieldsToRULabels.Employe[key]}
-                            {   key != 'POST_ID' ? 
-                                <input value={ value }
-                                    onChange={changeInputHandler(key)}
-                                    key={key} 
-                                    name={key} 
+        <div className={style.main}>
+            <FormControl className={style.Form}>
+                    {Object.keys(employeInfo).map((prop:string) =>  
+                        prop !== 'ID' && <FormLabel className={style.label}  
+                            key={prop}
+                            htmlFor={prop}>
+                            {translatorFieldsToRULabels.Employe[prop]}
+                            {prop != 'POST_ID' ?
+                                <TextField className={style.input}  
+                                    onChange= {inputChangeHandler}
+                                    value={currentEmployeInfo[prop]}
+                                    name={prop} 
                                     type='text'/> 
-                                :   
-                                <select  value={currentEmployeInfo[key]}
+                                :
+                                <Select value={currentEmployeInfo[prop]}
                                         name='POST_ID'
-                                        onChange={changeInputHandler(key)}>
+                                        onChange={selectChangeHandler}>
                                     {selectOptions.map(({ID, POST_NAME}) => {
-                                        return <option key = {ID}
+                                        return <MenuItem key = {ID}
                                                     value = {ID}>
                                                     {POST_NAME}
-                                                </option>
+                                                </MenuItem >
                                     })}
-                                </select>
-                                }
-                            </label>))
+                                </Select>
                             }
-                        )
+                        </FormLabel>)
                     }
-                </fieldset>
-                <div className={style.ButtonBlock}>
-                    <button onClick={ clickSendHandler}>Send</button>
-                    <button>Cancel</button>
-                </div>
-            </form>
+                <FormGroup className={style.ButtonBlock}>
+                    <Button className={style.Button} variant='contained' onClick={clickSendHandler}>Send</Button>
+                    <Button className={style.Button} variant='contained'> Cancel</Button>
+                </FormGroup>
+            </FormControl>
         </div>
     );
 }

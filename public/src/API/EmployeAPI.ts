@@ -59,12 +59,13 @@ class EmployeAPI {
 
     addEmploye = async (employeInfo: any, token:string) => {
         try {
+            console.log(this.baseURL)
             const res = await fetch(`${this.baseURL}`,
             {
                 method:'POST',
                 headers:{
                     'Content-type':'application/json',
-                    'Authoriztion':token
+                    'Authorization':token
                 },
                 body: JSON.stringify(employeInfo)
             })

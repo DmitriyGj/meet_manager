@@ -12,10 +12,11 @@ import IMeeting from '../../public/src/types/Meeting.model';
 interface IMeetingsPage {
     rows:  GridRowsProp | any
     columns: GridColDef[] | any
+    token: string
 }
 
 
-const Meetings = ({rows,columns} : IMeetingsPage) => {
+const Meetings = ({rows,columns, token} : IMeetingsPage) => {
     const router = useRouter();
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
 
@@ -31,7 +32,7 @@ const Meetings = ({rows,columns} : IMeetingsPage) => {
         (async () => {
             try{
                 if(selectedRow){
-                    await MeetingsAPI.removeMeeting(selectedRow.toString());
+                    await MeetingsAPI.removeMeeting(selectedRow.toString(), token);
                 }
                 else{
                     alert('Выберите запись');
@@ -55,7 +56,6 @@ const Meetings = ({rows,columns} : IMeetingsPage) => {
                 <Button variant='contained'  
                         onClick={clickAddHandler}
                         style={{borderRadius: 35,
-                            backgroundColor: "gray",
                             fontSize: "14px",
                             width: '10%',
                             margin: '0% 1%'}}
@@ -63,7 +63,6 @@ const Meetings = ({rows,columns} : IMeetingsPage) => {
                 <Button variant='contained' 
                         onClick={clickRemoveHandler}
                         style={{borderRadius: 35,
-                                backgroundColor: "gray",
                                 fontSize: "14px",
                                 width: '10%',
                                 margin: '0% 1%'}}
@@ -71,7 +70,6 @@ const Meetings = ({rows,columns} : IMeetingsPage) => {
                 <Button variant='contained'
                         onClick = {clickChangeHandler}
                         style={{borderRadius: 35,
-                                backgroundColor: "gray",
                                 fontSize: "14px",
                                 width: '10%',
                                 margin: '0% 1%'
@@ -93,7 +91,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                 }
             } 
         }
-        const data = await MeetingsAPI.getMeetings();
+        const data = await MeetingsAPI.getMeetings(token as string);
         console.log(data)
         if(data.status === 403){
             return {
@@ -111,7 +109,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
         });
         const rows = (data as IMeeting[]).map((item) => ({id: item.ID, ...item}))
         return { props: 
-                {rows , columns} 
+                {rows , columns, token} 
             };
     }
     catch(e){

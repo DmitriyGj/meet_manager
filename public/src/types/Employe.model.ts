@@ -1,4 +1,5 @@
 import { IPost } from "./Post.model"
+import { Buffer } from "./Buffer"
 
 export interface IEmployeInfo {
     ID:string, //id
@@ -11,7 +12,7 @@ export interface IEmployeInfo {
     POST_NAME:string
 }
 
-export interface IEmployeResonseData extends IEmployeInfo {
+export interface IEmployeResonseData extends IEmployeInfo, Buffer<string> {
     POST_ID: string
 }
 

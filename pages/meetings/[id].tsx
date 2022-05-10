@@ -1,104 +1,117 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { ChangeEvent, MouseEventHandler, useState } from "react";
-import style from './addEmploye.module.scss';
+import { MouseEventHandler, useEffect, useState, useRef } from "react";
+import style from './addMeeting.module.scss';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
-import PostAPI from "../../public/src/API/PostAPI";
+import MeetingsAPI from "../../public/src/API/MeetingsAPI";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
+import { DataGrid, GridApi, GridColDef, GridRowId, GridRowsProp } from "@mui/x-data-grid";
+import { DataGridPro  } from '@mui/x-data-grid-pro';
+import { IEmploye } from "../../public/src/types/Employe.model";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { Button, FormControl, FormLabel, TextField } from "@mui/material";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { useGridApiRef } from '@mui/x-data-grid';
 
-interface EditEmployePageProps {
-    employeInfo:{
-        ID:string,
-        NAME: string,
-        LAST_NAME: string,
-        PATRONYMIC: string,
-        ADDRESS: string,
-        EMAIL: string,
-        PHONE: string,
-        POST_ID: number
-    },
-    selectOptions: {ID:string, POST_NAME:string}[]
+interface IMeeting {
+    ID:number
+    START_DATE:Date,
+    END_DATE:Date;
+    members: string[]
+}
+
+interface EditMeetingPageProps {
+    meetingInfo:IMeeting,
+    rows: GridRowsProp ,
+    columns: string[] | any
 };
 
-const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
-    const [currentEmployeInfo, setEmployeInfo] = useState(employeInfo);
+const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => {
+    const router = useRouter();
+    const apiRef = useRef<GridApi>(null);
+    const [currentMeetingInfo, setMeetingInfo] = useState(meetingInfo);
 
     const clickSendHandler: MouseEventHandler = (e) => {
         e.preventDefault();
         (async() => {
             try{
                 const token = getCookie('token')
-                await EmployeAPI.editEmploye(+employeInfo.ID, currentEmployeInfo,token as string);
+                await MeetingsAPI.editMeeting(+meetingInfo.ID, currentMeetingInfo,token as string);
             }
             catch(e){
                 alert('что-то пошло не так')
             }
             finally{
-                router.push('/employes')
+                router.push('/meetings')
             }
 
         })();
     };
-    const changeInputHandler = (key:string) => ({target}:ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setEmployeInfo({...currentEmployeInfo,[key]:target?.value})
-    }
 
-    
-    const router = useRouter();
-    return(
-        <div>
-            <form className={style.Form}>
-                <fieldset>
-                    {Object.entries(currentEmployeInfo).map(([key,value]) =>{
-                        return(
-                            (key !== 'ID') && (
-                            <label>{translatorFieldsToRULabels.Employe[key]}
-                            {   key != 'POST_ID' ? 
-                                <input value={ value }
-                                    onChange={changeInputHandler(key)}
-                                    key={key} 
-                                    name={key} 
-                                    type='text'/> 
-                                :   
-                                <select  value={currentEmployeInfo[key]}
-                                        name='POST_ID'
-                                        onChange={changeInputHandler(key)}>
-                                    {selectOptions.map(({ID, POST_NAME}) => {
-                                        return <option key = {ID}
-                                                    value = {ID}>
-                                                    {POST_NAME}
-                                                </option>
-                                    })}
-                                </select>
-                                }
-                            </label>))
-                            }
-                        )
-                    }
-                </fieldset>
-                <div className={style.ButtonBlock}>
-                    <button onClick={ clickSendHandler}>Send</button>
-                    <button>Cancel</button>
-                </div>
-            </form>
-        </div>
+
+    return(<div className={style.main}>
+                        <FormControl className={style.Form}>
+                                <LocalizationProvider dateAdapter={AdapterDateFns} >
+                                        <DateTimePicker hideTabs
+                                                        showTodayButton
+                                                        className={style.Picker} label='Начало встречи' 
+                                                        onChange={(date) => {
+                                                            if(date){
+                                                                setMeetingInfo({...meetingInfo,START_DATE:date});
+                                                            }
+                                                        }}  
+                                                        value={meetingInfo.START_DATE} 
+                                                        renderInput={(props) => <TextField className={style.input} {...props}/> } />
+                                        
+                                        <DateTimePicker label='Конец встречи' 
+                                                        onChange={(date) => {
+                                                            if(date){
+                                                                setMeetingInfo({...meetingInfo,END_DATE:date});
+                                                            }
+                                                        }}  
+                                                        value={meetingInfo.END_DATE} 
+                                                        renderInput={(props) => <TextField className={style.input} {...props}/> }/>
+                                </LocalizationProvider>
+                                <FormLabel>
+                                    Участники
+                                </FormLabel>
+                                <DataGrid selectionModel={meetingInfo.members}
+                                        checkboxSelection
+                                        className={style.DataGrid} 
+                                        rows={rows} 
+                                        columns={columns}/>
+
+                                        
+                            <div className={style.ButtonBlock}>
+                                <Button variant='contained'
+                                    onClick={clickSendHandler}>Send</Button>
+                                <Button variant='contained'>Cancel</Button>
+                            </div>
+                        </FormControl>
+                    </div>
     );
 }
 
 export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
     const {req, res} = ctx;
-    const selectOptions = await PostAPI.getPosts();
     const token = getCookie('token',{req,res});
-    const employeInfo = await EmployeAPI.getEmployeById(id as string, token as string);
-
+    const meetingInfo = await MeetingsAPI.getMeetingById(id as string, token as string) as IMeeting;
+    const data = await EmployeAPI.getEmployes(token as string);
+    const columns:GridColDef[] = []
+    Object.keys(data[0]).forEach((col: string) =>{
+        if(!col.includes('_ID')){
+            columns.push({field:col, headerName: translatorFieldsToRULabels.Employe[col], width:150})
+        }
+    });
+    const rows = (data as IEmploye[]).map((item) => ({id: item.ID,selected: true, ...item}))
     return {
         props: {
-            employeInfo,
-            selectOptions
+            meetingInfo,rows,columns, token
         }
     }
+
 };
 
-export default AddEmployePage;
+export default EditMeetingPage;

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { ChangeEvent,  MouseEventHandler, useState } from "react";
+import {   ChangeEventHandler,  MouseEventHandler, ReactNode, useState } from "react";
 import style from './addEmploye.module.scss';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
 import PostAPI  from '../../public/src/API/PostAPI';
@@ -8,85 +8,86 @@ import InitValues from '../../public/src/utils/initValues';
 import { IPost } from "../../public/src/types/Post.model";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
+import { FormGroup, FormLabel, TextField, Select, MenuItem, SelectChangeEvent ,FormControl , Button } from "@mui/material";
+import {IEmployeResonseData } from '../../public/src/types/Employe.model';
 
 interface AddEmployePageProps {
-    employeFields:{
-        NAME: string,
-        LAST_NAME: string,
-        PATRONYMIC: string,
-        ADDRESS: string,
-        EMAIL: string,
-        PHONE: string,
-        POST_ID: number
-    },
-    selectOptions: IPost[]
+    employeFields:IEmployeResonseData
+    selectOptions: IPost[],
+    token: string
 };
 
-const AddEmployePage = ({employeFields, selectOptions}: AddEmployePageProps) => {
-    const [employeInfo, setEmployeInfo] = useState({...employeFields,['POST_ID']:selectOptions[0].ID,});
+const AddEmployePage = ({employeFields, selectOptions, token}: AddEmployePageProps) => {
+    const [employeInfo, setEmployeInfo] = useState<IEmployeResonseData>({...employeFields,['POST_ID']:selectOptions[0].ID,});
     const router = useRouter();
 
-    const inputChangeHandler =  ({target}: ChangeEvent<HTMLInputElement>) =>  setEmployeInfo({...employeInfo,[target.name]:target.value})
+    const inputChangeHandler:ChangeEventHandler<HTMLInputElement> =  ({target}) =>  {
+        setEmployeInfo({...employeInfo,[target.name]:target.value})
+        console.log(employeInfo)
+    };
+    const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...employeInfo,[target.name]:target.value}); console.log(employeInfo)};
+    
     const addClickHandler: MouseEventHandler = (e) =>  {
         (async() => {
             try{
-                const token = getCookie('token')
-                await EmployeAPI.addEmploye(employeInfo, token as string);
+                await EmployeAPI.addEmploye(employeInfo, token);
             }
             catch(e){
                 alert('что-то пошло не так');
             }
             finally{
-                router.push('/employes');
             }
 
         })()
     }
-    const onchangeSelectHandler =  ({target}: ChangeEvent<HTMLSelectElement>) => {
-        setEmployeInfo({...employeInfo,[target.name]:target.value})
-    }
 
     return(
-        <div>
-            <form className={style.Form}>
-                <fieldset>
-                    {Object.keys(employeFields).map((prop) =>  
-                    <label  key={prop} >{translatorFieldsToRULabels.Employe[prop]}
-                        {prop != 'POST_ID' ?
-                            <input  onChange= {inputChangeHandler}
-                                name={prop} 
-                                type='text'/> 
-                            :
-                            <select name='POST_ID'
-                                    onChange={onchangeSelectHandler}>
-                                {selectOptions.map(({ID, POST_NAME}) => {
-                                    return <option key = {ID}
-                                                value = {ID}>
-                                                {POST_NAME}
-                                            </option>
-                                })}
-                            </select>
-                        }
-                    </label>)
+        <div className={style.main}>
+            <FormControl className={style.Form}>
+                    {Object.keys(employeInfo).map((prop:string) =>  
+                        <FormLabel className={style.label}  
+                            key={prop}
+                            htmlFor={prop}>
+                            {translatorFieldsToRULabels.Employe[prop]}
+                            {prop != 'POST_ID' ?
+                                <TextField className={style.input}  
+                                    onChange= {inputChangeHandler}
+                                    value={employeInfo[prop]}
+                                    name={prop} 
+                                    type='text'/> 
+                                :
+                                <Select value={employeInfo[prop]}
+                                        name='POST_ID'
+                                        onChange={selectChangeHandler}>
+                                    {selectOptions.map(({ID, POST_NAME}) => {
+                                        return <MenuItem key = {ID}
+                                                    value = {ID}>
+                                                    {POST_NAME}
+                                                </MenuItem >
+                                    })}
+                                </Select>
+                            }
+                        </FormLabel>)
                     }
-
-                </fieldset>
-                <div className={style.ButtonBlock}>
-                    <button onClick={addClickHandler}>Send</button>
-                    <button>Cancel</button>
-                </div>
-            </form>
+                <FormGroup className={style.ButtonBlock}>
+                    <Button className={style.Button} variant='contained' onClick={addClickHandler}>Send</Button>
+                    <Button className={style.Button} variant='contained'> Cancel</Button>
+                </FormGroup>
+            </FormControl>
         </div>
     );
 }
 
-export const getServerSideProps : GetServerSideProps = async() => {
+export const getServerSideProps : GetServerSideProps = async(ctx) => {
     try{
+        const {req, res} = ctx;
+        const token = getCookie('token',{req,res});
         const selectOptions = await PostAPI.getPosts();
         return {
             props: {
                 employeFields: InitValues.EmployeInfo,
-                selectOptions
+                selectOptions,
+                token
             }
         }
     }

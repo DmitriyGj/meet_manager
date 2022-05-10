@@ -135,9 +135,9 @@ const Employes = ({rows, columns, token, role} : IEmployesPage) => {
             <h1>Работники</h1>
             {showStats &&
                 <ModalWindow title='Статистика' visible={showStats} onClose={() => {
-                    setChartInfo([]);
-                    setShowStats(false);
-                }}>
+                            setChartInfo([]);
+                            setShowStats(false);
+                        }}>
                     <EmployeChart title ='Количество встреч' dataset={chartInfo}/>
                 </ModalWindow> }
             <DataGrid components={{Toolbar: CustomToolbar, 

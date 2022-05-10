@@ -11,12 +11,15 @@ import IMeeting from '../../public/src/types/Meeting.model';
 
 interface IMeetingsPage {
     rows:  GridRowsProp | any
-    columns: GridColDef[] | any
     token: string
 }
 
-
-const Meetings = ({rows,columns, token} : IMeetingsPage) => {
+const columns: GridColDef[] =
+[{field: 'ID' , headerName: 'ID', width:150},
+{field: 'START_DATE' , headerName: 'Начало', width:150},
+{field: 'END_DATE' , headerName: 'Конец', width:150}]
+ 
+const Meetings = ({rows, token} : IMeetingsPage) => {
     const router = useRouter();
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
 
@@ -105,15 +108,10 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                 }
             }
         }
-        const columns:GridColDef[] = []
-        Object.keys(data[0]).forEach((col: string) =>{
-            if(!col.includes('_ID')){
-                columns.push({field:col, headerName: translatorFieldsToRULabels.Meeting[col], width:250})
-            }
-        });
+
         const rows = (data as IMeeting[]).map((item) => ({id: item.ID, ...item}))
         return { props: 
-                {rows , columns, token} 
+                {rows ,  token} 
             };
     }
     catch(e){

@@ -16,7 +16,7 @@ import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 interface IMeeting {
     START_DATE:Date,
     END_DATE:Date;
-    members: number[] | []
+    MEMBERS: string[] | []
 }
 
 interface IAddMeetingPage {
@@ -26,7 +26,7 @@ interface IAddMeetingPage {
 }
 
 const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
-    const [meetingInfo, setMeetingInfo] = useState<IMeeting >({START_DATE:new Date(), END_DATE:new Date(), members:[]});
+    const [meetingInfo, setMeetingInfo] = useState<IMeeting >({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[]});
     const router = useRouter();
 
     const addClickHandler: MouseEventHandler = (e) =>  {
@@ -45,7 +45,7 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
     }
     
     const selectEmployeHandler = (e:any) => {
-        setMeetingInfo({...meetingInfo, members:[...e.map((item:string) => {ID:+item})]})
+        setMeetingInfo({...meetingInfo, MEMBERS:e})
     }
     return(
         <div className={style.main}>
@@ -56,19 +56,19 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
                                             showTodayButton
                                             className={style.Picker} label='Начало встречи' 
                                             onChange={(date) => {
-                                                if(date){
-                                                    setMeetingInfo({...meetingInfo,START_DATE:date});
-                                                }
-                                            }}  
+                                                    if(date){
+                                                        setMeetingInfo({...meetingInfo,START_DATE:date});
+                                                    }
+                                                }}  
                                             value={meetingInfo.START_DATE} 
                                             renderInput={(props) => <TextField className={style.inputPicker} {...props}/> } />
                             
                             <DateTimePicker label='Конец встречи' 
                                             onChange={(date) => {
-                                                if(date){
-                                                    setMeetingInfo({...meetingInfo,END_DATE:date});
-                                                }
-                                            }}  
+                                                    if(date){
+                                                        setMeetingInfo({...meetingInfo,END_DATE:date});
+                                                    }
+                                                }}  
                                             value={meetingInfo.END_DATE} 
                                             renderInput={(props) => <TextField className={style.inputPicker} {...props}/> }/>
                     </LocalizationProvider>

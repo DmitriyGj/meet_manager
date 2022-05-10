@@ -39,7 +39,6 @@ const EditMeetingPage = ({meetingInfo, rows, columns}: EditMeetingPageProps) => 
         (async() => {
             try{
                 const token = getCookie('token')
-                console.log(currentMeetingInfo)
                 await MeetingsAPI.editMeeting(+meetingInfo.ID, currentMeetingInfo,token as string);
             }
             catch(e){

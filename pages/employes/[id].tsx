@@ -37,7 +37,7 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
         setEmployeInfo({...currentEmployeInfo,[target.name]:target.value})
     };
 
-    const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...employeInfo,[target.name]:target.value}); };
+    const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...currentEmployeInfo,[target.name]:target.value}); };
     
 
     const router = useRouter();

@@ -1,21 +1,29 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { ChangeEvent, ChangeEventHandler, MouseEventHandler, ReactNode, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, MouseEventHandler, ReactNode, useEffect, useState } from "react";
 import style from './addEmploye.module.scss';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
 import PostAPI from "../../public/src/API/PostAPI";
+import RoleAPI from "../../public/src/API/RoleAPI";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
 import { Button, FormControl, FormGroup, FormLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { IEmployeResonseData } from "../../public/src/types/Employe.model";
+import {Buffer} from '../../public/src/types/Buffer';
+import { IPost } from "../../public/src/types/Post.model";
+import { IRoleResonseData } from "../../public/src/types/Role.model";
 
 interface EditEmployePageProps {
     employeInfo:IEmployeResonseData,
-    selectOptions: {ID:string, POST_NAME:string}[]
+    selectOptions: Buffer<{value:string, displayName:string}[]>
 };
 
 const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
     const [currentEmployeInfo, setEmployeInfo] = useState(employeInfo);
+
+    useEffect(() => {
+        console.log(selectOptions)
+    })
 
     const clickSendHandler: MouseEventHandler = (e) => {
         e.preventDefault();
@@ -45,11 +53,11 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
         <div className={style.Main}>
             <FormControl className={style.Form}>
                     {Object.keys(employeInfo).map((prop:string) =>  
-                        prop !== 'ID' && <FormLabel className={style.label}  
+                        prop !== 'ID' && prop != 'USER_ID' && <FormLabel className={style.label}  
                             key={prop}
                             htmlFor={prop}>
                             {translatorFieldsToRULabels.Employe[prop]}
-                                {prop != 'POST_ID' ?
+                                {!prop.includes('_ID') ?
                                     <TextField className={style.input}  
                                         onChange= {inputChangeHandler}
                                         value={currentEmployeInfo[prop]}
@@ -59,10 +67,10 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
                                 <Select value={currentEmployeInfo[prop]}
                                         name='POST_ID'
                                         onChange={selectChangeHandler}>
-                                    {selectOptions.map(({ID, POST_NAME}) => {
-                                        return <MenuItem key = {ID}
-                                                    value = {ID}>
-                                                    {POST_NAME}
+                                    {selectOptions[prop]?.map(({value, displayName}) => {
+                                        return <MenuItem key = {value}
+                                                    value = {value}>
+                                                    {displayName}
                                                 </MenuItem >
                                     })}
                                 </Select>
@@ -71,7 +79,6 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
                     }
                 <FormGroup className={style.ButtonBlock}>
                     <Button className={style.Button} variant='contained' onClick={clickSendHandler}>Send</Button>
-                    <Button className={style.Button} variant='contained'> Cancel</Button>
                 </FormGroup>
             </FormControl>
         </div>
@@ -81,9 +88,14 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
 export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
     const {req, res} = ctx;
-    const selectOptions = await PostAPI.getPosts();
+    const selectOptionsPosts: IPost[] = await PostAPI.getPosts();
+    const parsedSelectOptionsPosts = selectOptionsPosts.map(({ID, POST_NAME}) =>  ({value: ID, displayName: POST_NAME}));
+    const selectOptionsRoles: IRoleResonseData[] = await RoleAPI.getRoles();
+    const parsedSelectOptionsRoles = selectOptionsRoles.map(({ROLE_ID, ROLE_NAME}) =>  ({value: ROLE_ID, displayName: ROLE_NAME}));
     const token = getCookie('token',{req,res});
-    const employeInfo = await EmployeAPI.getEmployeById(id as string, token as string);
+    const employeInfo: IEmployeResonseData  = await EmployeAPI.getEmployeById(id as string, token as string);
+    const selectOptions = {POST_ID: parsedSelectOptionsPosts,ROLE_ID:parsedSelectOptionsRoles }
+    console.log(employeInfo)
 
     return {
         props: {

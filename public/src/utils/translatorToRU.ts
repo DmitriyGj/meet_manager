@@ -1,6 +1,9 @@
 import {Buffer} from '../types/Buffer';
 const translatorFieldsToRULabels: Buffer<Buffer<string>> = {
     Employe:{
+    'LOGIN':'Логин',
+    'PASSWORD':'Пароль',
+    'ROLE_ID':'Роль',
     'ID':'ID',
     'POST_NAME':'Должность',
     'POST_ID': 'Должность',

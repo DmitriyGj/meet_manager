@@ -23,7 +23,7 @@ class EmployeAPI {
         }
     }
     
-    getEmployeById = async (id:string, token:string): Promise<IEmploye | undefined> => {
+    getEmployeById = async (id:string, token:string) => {
         try{
             const res = await fetch(`${this.baseURL}/${id}`,{
                 method:'GET',

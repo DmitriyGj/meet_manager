@@ -6,7 +6,10 @@ const Initvalues = {
         ADDRESS: '',
         EMAIL: '',
         PHONE: '',
-        POST_ID:''
+        LOGIN:'',
+        PASSWORD:'',
+        POST_ID:'',
+        ROLE_ID:'',
     },
 };
 

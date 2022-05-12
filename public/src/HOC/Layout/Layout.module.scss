@@ -1,29 +1,38 @@
-.Layout{ 
+.Wrapper{ 
     box-sizing: border-box;
-    display: grid;
-    grid-template-columns: 30% 70%;
-    grid-template-rows: 10% 80% 10%;
-    height: 100vh;
-    justify-content: center;
-    background-color: #5490a88a;
+    display: flex;
+    flex-direction: column;
 
-    & * {
+    .Layout{
         box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+        display: grid;
+        grid-template-columns: 30% 70%;
+        grid-template-rows: 10% 1fr 10%;
+        background-color: #5490a88a;
+        height: 100vh;
 
-    .Header{
-        grid-column:1/-1 ;
-        grid-row:1/2;
-    }
+        > * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
     
-    .Footer{
-        grid-column:1/-1;
-        grid-row:3/-1;
-    }
-    .Body{
-        grid-column: 1/-1;
-        grid-row:2/3;
+        .Header{
+            grid-column:1/-1 ;
+            grid-row:1/2;
+        }
+        
+        .Footer{
+            grid-column:1/-1;
+            grid-row:3/-1;
+    
+        }
+        .Body{
+            grid-column: 1/-1;
+            grid-row:2/3;
+            display: flex;
+            justify-content: center;
+            box-sizing: border-box;
+        }
     }
 }

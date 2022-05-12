@@ -9,11 +9,15 @@ export interface IEmployeInfo {
     ADDRESS: string,
     EMAIL: string,
     PHONE: string,
+}
+
+export interface IEmployeInfoDTO extends IEmployeInfo {
     POST_NAME:string
 }
 
-export interface IEmployeResonseData extends IEmployeInfo, Buffer<string> {
+export interface IEmployeResonseData extends Omit<IEmployeInfo,'USER_ID'>, Buffer<string> {
     POST_ID: string
+    ROLE_ID: string
 }
 
 export interface IEmploye extends IEmployeInfo {

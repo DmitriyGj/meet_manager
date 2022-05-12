@@ -10,23 +10,20 @@ interface ILayoutProps {
 }
 
 export const Layout = ({children} : ILayoutProps ) => {
-    const [showNav, setShowNav ] = useState(); 
-
-    useEffect(() => {
-
-    });
-
-    return(<div className={style.Layout}>
-        <Header logo = {<Logo/>}className = { style.Header } />
-            <div className = { style.Body } >
-                { children }
-            </div>
-        <Footer logo = {<Logo/>} className = { style.Footer }>
-            <div>
-                <ExtendedLink title={`VK`} href={'https://vk.com/mylighting'}/>
-                <ExtendedLink title={`TG`} href={'https://t.me/dritmiy_milyutin'}/>
-            </div>
-        </Footer>
+    return(
+        <div className={style.Wrapper}>
+            <div className={style.Layout}>
+                <Header logo = {<Logo/>}className = { style.Header } />
+                    <div className = { style.Body } >
+                        { children }
+                    </div>
+                <Footer logo = {<Logo/>} className = { style.Footer }>
+                    <div>
+                        <ExtendedLink title={`VK`} href={'https://vk.com/mylighting'}/>
+                        <ExtendedLink title={`TG`} href={'https://t.me/dritmiy_milyutin'}/>
+                    </div>
+                </Footer>
+        </div>
     </div>)
 }
 

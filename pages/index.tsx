@@ -1,26 +1,27 @@
 import type { GetServerSideProps, NextPage } from 'next'
 import styles from '../styles/Home.module.css'
 import {getCookie, getCookies} from 'cookies-next';
+import JWT from 'jwt-decode';
 
-const Meetings: NextPage = () => {
+
+interface UserPageProps {
+    userInfo: any
+}
+
+const UserPage = ({userInfo}: UserPageProps) => {
     return (<div className={styles.container}>
-            <h1>Auth</h1>
+            {
+                Object.entries(userInfo).map(([key,value]) => 
+                    <>{key}: {value}</>
+                )
+            }
         </div>
     )
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const {req,res} = ctx;
-    const token = getCookie('token', {req,res})
-    if(!token){
-        return {redirect: {
-            destination: '/login',
-            permanent: false
-        }}
-    }
-    else{
-        return {props: {}}
-    }
+    const {user} = JWT(ctx.req.cookies['token']) as {user: any};
+    return {props: {userInfo:user}}
 }
 
-export default Meetings
+export default UserPage

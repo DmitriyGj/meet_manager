@@ -91,24 +91,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
     try{
         const {req,res} = ctx;
         const token = getCookie('token',{req,res});
-        if(!token){
-            return {
-                redirect: {
-                    destination: '/login',
-                    permanent:false,
-                }
-            } 
-        }
         const data = await MeetingsAPI.getMeetings(token as string);
-        if(data.status === 403){
-            return {
-                redirect: {
-                    destination: '/login',
-                    permanent:false,
-                }
-            }
-        }
-
         const rows = (data as IMeeting[]).map((item) => ({id: item.ID, ...item}))
         return { props: 
                 {rows ,  token} 

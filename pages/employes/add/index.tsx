@@ -2,17 +2,17 @@ import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
 import {   ChangeEventHandler,  MouseEventHandler, ReactNode, useState } from "react";
 import style from './addEmploye.module.scss';
-import EmployeAPI from '../../public/src/API/EmployeAPI';
-import PostAPI  from '../../public/src/API/PostAPI';
-import InitValues from '../../public/src/utils/initValues';
-import { IPost } from "../../public/src/types/Post.model";
-import { Buffer } from "../../public/src/types/Buffer";
-import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
+import EmployeAPI from '../../../public/src/API/EmployeAPI';
+import PostAPI  from '../../../public/src/API/PostAPI';
+import InitValues from '../../../public/src/utils/initValues';
+import { IPost } from "../../../public/src/types/Post.model";
+import { Buffer } from "../../../public/src/types/Buffer";
+import translatorFieldsToRULabels from "../../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
 import { FormGroup, FormLabel, TextField, Select, MenuItem, SelectChangeEvent ,FormControl , Button } from "@mui/material";
-import {IEmployeResonseData } from '../../public/src/types/Employe.model';
-import { IRoleResonseData } from "../../public/src/types/Role.model";
-import RoleAPI from "../../public/src/API/RoleAPI";
+import {IEmployeResonseData } from '../../../public/src/types/Employe.model';
+import { IRoleResonseData } from "../../../public/src/types/Role.model";
+import RoleAPI from "../../../public/src/API/RoleAPI";
 
 interface AddEmployePageProps {
     employeFields:IEmployeResonseData
@@ -47,7 +47,6 @@ const AddEmployePage = ({employeFields, selectOptions, token}: AddEmployePagePro
     }
 
     return(
-
                 <FormControl className={style.Form}>
                         {Object.keys(employeInfo).map((prop:string) =>  
                             <FormLabel className={style.label}  

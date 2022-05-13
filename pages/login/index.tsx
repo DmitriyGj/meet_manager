@@ -1,13 +1,10 @@
 import { useRouter } from "next/router";
 import { ChangeEventHandler, MouseEventHandler, useState } from "react";
-import AuthAPI from "../public/src/API/AuthAPI";
+import AuthAPI from "../../public/src/API/AuthAPI";
 import { setCookies } from 'cookies-next';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
-import InputBase from '@mui/material/InputBase'
-import Input from '@mui/material/Input';
-import InputLabel from "@mui/material/InputLabel";
-import style from '../public/src/Components/Froms/Login.module.scss'
+import style from '../../public/src/Components/Froms/Login.module.scss'
 import { FormGroup, FormLabel, TextField } from "@mui/material";
 
 const LoginPage = () => {

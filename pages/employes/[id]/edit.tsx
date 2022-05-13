@@ -1,17 +1,17 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { ChangeEvent, ChangeEventHandler, MouseEventHandler, ReactNode, useEffect, useState } from "react";
-import style from './addEmploye.module.scss';
-import EmployeAPI from '../../public/src/API/EmployeAPI';
-import PostAPI from "../../public/src/API/PostAPI";
-import RoleAPI from "../../public/src/API/RoleAPI";
-import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
+import {  ChangeEventHandler, MouseEventHandler, ReactNode, useEffect, useState } from "react";
+import style from '../addEmploye.module.scss';
+import EmployeAPI from '../../../public/src/API/EmployeAPI';
+import PostAPI from "../../../public/src/API/PostAPI";
+import RoleAPI from "../../../public/src/API/RoleAPI";
+import translatorFieldsToRULabels from "../../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
 import { Button, FormControl, FormGroup, FormLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
-import { IEmployeResonseData } from "../../public/src/types/Employe.model";
-import {Buffer} from '../../public/src/types/Buffer';
-import { IPost } from "../../public/src/types/Post.model";
-import { IRoleResonseData } from "../../public/src/types/Role.model";
+import { IEmployeResonseData } from "../../../public/src/types/Employe.model";
+import {Buffer} from '../../../public/src/types/Buffer';
+import { IPost } from "../../../public/src/types/Post.model";
+import { IRoleResonseData } from "../../../public/src/types/Role.model";
 
 interface EditEmployePageProps {
     employeInfo:IEmployeResonseData,
@@ -50,7 +50,6 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
 
     const router = useRouter();
     return(
-        <div className={style.Main}>
             <FormControl className={style.Form}>
                     {Object.keys(employeInfo).map((prop:string) =>  
                         prop !== 'ID' && prop != 'USER_ID' && <FormLabel className={style.label}  
@@ -81,7 +80,6 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
                     <Button className={style.Button} variant='contained' onClick={clickSendHandler}>Send</Button>
                 </FormGroup>
             </FormControl>
-        </div>
     );
 }
 

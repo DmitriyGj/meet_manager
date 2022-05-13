@@ -1,5 +1,4 @@
 import type { GetServerSideProps } from 'next'
-import styles from '../../styles/Home.module.css'
 import { DataGrid, GridApi, GridColDef, GridColumnMenuContainer, GridColumnMenuProps, GridExportMenuItemProps, gridFilteredSortedRowIdsSelector, GridRowsProp, GridToolbarContainer, GridToolbarExport, GridToolbarExportContainer, gridVisibleColumnFieldsSelector, SortGridMenuItems, useGridApiContext } from '@mui/x-data-grid'
 import Button  from '@mui/material/Button'
 import { forwardRef,  useRef, useState } from 'react';
@@ -97,7 +96,7 @@ const Employes = ({rows, columns, token, ROLE_NAME} : IEmployesPage) => {
 
     const clickChangeHandler = () => {
         if(selectedRow){
-            router.push(`/employes/${selectedRow}`)
+            router.push(`/employes/${selectedRow}/edit`)
         } 
         else{
             alert('Выберите запись');
@@ -173,23 +172,7 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
         try{
             const {req,res} = ctx;
             const token = getCookie('token',{req,res});
-            if(!token){
-                return {
-                    redirect: {
-                        destination: '/login',
-                        permanent:false,
-                    }
-                } 
-            }
             const data = await EmployeAPI.getEmployes(token as string);
-            if(data.status === 403){
-                return {
-                    redirect: {
-                        destination: '/login',
-                        permanent:false,
-                    }
-                }
-            }
             const {ROLE_NAME} = (JWT.decode(`${token}`)as {user:{ROLE_NAME: string}}).user;
             console.log(ROLE_NAME.trim())
             const columns:GridColDef[] = []
@@ -199,6 +182,9 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                 }
             });
             const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
+
+            console.log(rows, data, 1);
+
             return { props: 
                     {rows , columns, token, ROLE_NAME:ROLE_NAME.trim()} 
                 };

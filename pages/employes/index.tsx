@@ -1,6 +1,6 @@
 import type { GetServerSideProps } from 'next'
 import { DataGrid, GridApi, GridColDef, GridColumnMenuContainer, GridColumnMenuProps, GridExportMenuItemProps, gridFilteredSortedRowIdsSelector, GridRowsProp, GridToolbarContainer, GridToolbarExport, GridToolbarExportContainer, gridVisibleColumnFieldsSelector, SortGridMenuItems, useGridApiContext } from '@mui/x-data-grid'
-import Button  from '@mui/material/Button'
+import {Button}  from '@mui/material'
 import { forwardRef,  useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import EmployeAPI from '../../public/src/API/EmployeAPI';
@@ -173,6 +173,15 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
             const {req,res} = ctx;
             const token = getCookie('token',{req,res});
             const data = await EmployeAPI.getEmployes(token as string);
+            console.log(data)
+            if(data === 401 || data === 403){
+                return { 
+                    redirect: {
+                        destination:'/login',
+                        permanent:false    
+                    }
+                }
+            }
             const {ROLE_NAME} = (JWT.decode(`${token}`)as {user:{ROLE_NAME: string}}).user;
             console.log(ROLE_NAME.trim())
             const columns:GridColDef[] = []
@@ -182,8 +191,6 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
                 }
             });
             const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
-
-            console.log(rows, data, 1);
 
             return { props: 
                     {rows , columns, token, ROLE_NAME:ROLE_NAME.trim()} 

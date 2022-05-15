@@ -91,6 +91,23 @@ class MeetingsAPI {
 
     }
 
+    getMeetingByEmployeId = async(employeId:string) => {
+        try{
+            const res = await fetch(`${this.baseURL}/${employeId}`,
+            {
+                method:'PUT',
+                headers:{
+                    'Content-type':'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify(data)
+            })
+        }
+        catch(e){
+            console.log(e);
+        }
+    }
+
 }
 
 export default new MeetingsAPI();

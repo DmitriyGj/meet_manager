@@ -12,6 +12,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {Button } from '@mui/material';
 import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
+import JWT from 'jwt-decode';
 
 interface IMeeting {
     START_DATE:Date,
@@ -25,14 +26,27 @@ interface IAddMeetingPage {
     token: string
 }
 
-const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
+const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
+    {field:'NAME', headerName: translatorFieldsToRULabels.Employe['NAME'], width:150},
+    {field:'LAST_NAME', headerName: translatorFieldsToRULabels.Employe['LAST_NAME'], width:150},
+    {field:'PATRONYMIC', headerName: translatorFieldsToRULabels.Employe['PATRONYMIC'], width:150},
+    {field:'PHONE', headerName: translatorFieldsToRULabels.Employe['PHONE'], width:150},
+    {field:'POST_NAME', headerName: translatorFieldsToRULabels.Employe['POST_NAME'], width:150},
+    {field:'DEPART_NAME', headerName: translatorFieldsToRULabels.Employe['DEPART_NAME'], width:150},
+    {field:'ADDRESS', headerName: translatorFieldsToRULabels.Employe['ADDRESS'], width:150},
+    {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150},
+]
+
+const AddMeetingPage = ({rows, token}: IAddMeetingPage) => {
     const [meetingInfo, setMeetingInfo] = useState<IMeeting >({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[]});
     const router = useRouter();
 
     const addClickHandler: MouseEventHandler = (e) =>  {
         (async() => {
             try{
-                const res = await MeetingsAPI.addMeeting(meetingInfo,token);
+                const {user} = JWT(token) as {user:any}
+                const meeting = await MeetingsAPI.addMeeting({INICIATOR_ID:user.ID  ,...meetingInfo},token);
+                console.log(meeting)
             }
             catch(e){
                 alert('что-то пошло не так');
@@ -80,7 +94,6 @@ const AddMeetingPage = ({rows, columns,token}: IAddMeetingPage) => {
                     <DataGrid 
                             onSelectionModelChange={selectEmployeHandler}
                             checkboxSelection
-                            className={style.DataGrid} 
                             rows={rows} 
                             columns={columns}/>
 
@@ -101,13 +114,21 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
         const {res,req } = ctx
         const token = getCookie('token', {req,res})
         const data = await EmployeAPI.getEmployes(token as string);
-        const columns:GridColDef[] = []
-        Object.keys(data[0]).forEach((col: string) =>{
-            if(!col.includes('_ID')){
-                columns.push({field:col, headerName: translatorFieldsToRULabels.Employe[col], width:150})
+        if(data === 403 || data === 401){
+            return {
+                redirect: {
+                    destination:'/login',
+                    permanent:false
+                }
             }
-        });
-        const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
+        }
+        const {user} = JWT(token as string) as {user: any};
+        console.log(user.ID)
+        const columns:GridColDef[] = []
+        const rows = (data as IEmploye[]).map((item) => {
+            if(+item.ID !== user.ID) 
+                return {id: item.ID, ...item}
+            }).filter(item => item)
         return {
             props: {
                 rows,columns, token

@@ -1,7 +1,7 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
 import {   ChangeEventHandler,  MouseEventHandler, ReactNode, useState } from "react";
-import style from './addEmploye.module.scss';
+import style from '../addEmploye.module.scss';
 import EmployeAPI from '../../../public/src/API/EmployeAPI';
 import PostAPI  from '../../../public/src/API/PostAPI';
 import InitValues from '../../../public/src/utils/initValues';
@@ -61,7 +61,7 @@ const AddEmployePage = ({employeFields, selectOptions, token}: AddEmployePagePro
                                         type='text'/> 
                                     :
                                     <Select value={employeInfo[prop]}
-                                            name='POST_ID'
+                                            name={prop}
                                             onChange={selectChangeHandler}>
                                         {selectOptions[prop].map(({value, displayName}) => {
                                             return <MenuItem key = {value}

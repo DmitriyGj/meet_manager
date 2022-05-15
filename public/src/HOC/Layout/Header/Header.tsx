@@ -16,7 +16,7 @@ export const Header = ( {logo,className,...props }: IHeaderProps ) => {
             </div>
         </ExtendedLink>
         <nav className={style.Nav}>
-            <ExtendedLink href='/' title="Главная" />
+            <ExtendedLink href='/' title="Личный кабинет" />
             <ExtendedLink href='/meetings' title = 'Встречи' />
             <ExtendedLink href='/employes' title =' Работники' />
             <ExtendedLink href='/guests' title='Гости' />

@@ -91,13 +91,22 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const selectOptionsRoles: IRoleResonseData[] = await RoleAPI.getRoles();
     const parsedSelectOptionsRoles = selectOptionsRoles.map(({ROLE_ID, ROLE_NAME}) =>  ({value: ROLE_ID, displayName: ROLE_NAME}));
     const token = getCookie('token',{req,res});
-    const employeInfo: IEmployeResonseData  = await EmployeAPI.getEmployeById(id as string, token as string);
+    const data: IEmployeResonseData | number = await EmployeAPI.getEmployeById(id as string, token as string);
+    
+    if(data === 401 || data === 403){
+        return {
+            redirect: {
+                destination:'/login',
+                permanent:false
+            }
+        }
+    }
     const selectOptions = {POST_ID: parsedSelectOptionsPosts,ROLE_ID:parsedSelectOptionsRoles }
-    console.log(employeInfo)
+    console.log(data)
 
     return {
         props: {
-            employeInfo,
+            employeInfo: data,
             selectOptions
         }
     }

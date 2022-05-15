@@ -15,6 +15,10 @@ class EmployeAPI {
                     'Authorization': token
                 }
             });
+            console.log(res)
+            if(!res.ok){
+                return res.status;
+            }
             const parsedData = await res.json();
             return parsedData;
         }
@@ -32,6 +36,9 @@ class EmployeAPI {
                     'Authorization': token
                 }
             });
+            if(!res.ok){
+                return res.status;
+            }
             const parsedData = await res.json();
             return parsedData;
         }
@@ -51,6 +58,9 @@ class EmployeAPI {
                     },
                     body: JSON.stringify({id})
                 });
+                if(!res.ok){
+                    return res.status;
+                }
         }
         catch(e){
             console.log(e);
@@ -68,6 +78,9 @@ class EmployeAPI {
                 },
                 body: JSON.stringify(employeInfo)
             })
+            if(!res.ok){
+                return res.status;
+            }
         }
         catch(e){
             console.log(e);
@@ -85,6 +98,9 @@ class EmployeAPI {
                 },
                 body: JSON.stringify(data)
             })
+            if(!res.ok){
+                return res.status;
+            }
         }
         catch(e){
             console.log(e);
@@ -92,9 +108,33 @@ class EmployeAPI {
 
     }
 
-    getEmployeChartInfo = async() : Promise<BarInfo[] | undefined>  => {
+    getEmployeChartInfo = async()  => {
         try {
             const res = await fetch(`${this.baseURL}_chart`);
+            if(!res.ok){
+                return res.status;
+            }
+            const parsedData = await res.json();
+            return parsedData;
+        }
+        catch(e){
+            console.log(e);
+        }
+    }
+
+    
+    getMeetingsOfEmploye = async(employeID:string) => {
+        try{
+            const res = await fetch(`${this.baseURL}/${employeID}/meetings`,
+            {
+                method:'GET',
+                headers:{
+                    'Content-type':'application/json'
+                }
+            })
+            if(!res.ok){
+                return res.status;
+            }
             const parsedData = await res.json();
             return parsedData;
         }

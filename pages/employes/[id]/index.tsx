@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         }
         const meetings: IMeeting[] = await EmployeAPI.getMeetingsOfEmploye(id as string)
         const rows = meetings.map((item) => ({id: item.ID, ...item}))
-        const initedMeetings = meetings.filter(item =>  item.INICIATOR_ID === id).map((item) => ({id: item.ID, ...item}))
+        const initedMeetings = meetings.filter(item =>  item.INICIATOR_ID.toString() === id ).map((item) => ({id: item.ID, ...item}))
         return {props: {userInfo, meetings:rows, initedMeetings}}
 
 

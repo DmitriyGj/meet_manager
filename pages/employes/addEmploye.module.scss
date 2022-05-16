@@ -1,14 +1,16 @@
 @import '../../styles//Global.module';
 
 .Form{
+    align-self:baseline ;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     width: 50%;
 
     *{
         padding: 0px;
+        margin: 0.5% auto;
     }
 
     .label{
@@ -21,7 +23,7 @@
         }
 
         .input {
-            margin: 1%;
+            margin: 0.5%;
         }
     }
 

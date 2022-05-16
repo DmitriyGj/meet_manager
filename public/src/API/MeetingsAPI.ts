@@ -14,6 +14,9 @@ class MeetingsAPI {
                     'Authorization': token
                 }
             });
+            if(!res.ok){
+                return res.status;
+            }
             const parsedData = await res.json();
             return parsedData;
         }
@@ -31,6 +34,9 @@ class MeetingsAPI {
                     'Authorization': token
                 }
             });
+            if(!res.ok){
+                return res.status;
+            }
             const parsedData = await res.json();
             return parsedData;
         }
@@ -50,6 +56,9 @@ class MeetingsAPI {
                     },
                     body: JSON.stringify({id})
                 });
+            if(!res.ok){
+                return res.status;
+            }
         }
         catch(e){
             console.log(e);
@@ -67,6 +76,9 @@ class MeetingsAPI {
                 },
                 body: JSON.stringify(meetingInfo)
             })
+            if(!res.ok){
+                return res.status;
+            }
         }
         catch(e){
             console.log(e);

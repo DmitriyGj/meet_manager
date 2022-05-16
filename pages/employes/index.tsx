@@ -18,10 +18,20 @@ import JWT from 'jsonwebtoken';
 
 interface IEmployesPage {
     rows:  GridRowsProp | any
-    columns: GridColDef[] | any
     token: string
     ROLE_NAME: string
 }
+
+const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
+    {field:'NAME', headerName: translatorFieldsToRULabels.Employe['NAME'], width:150},
+    {field:'LAST_NAME', headerName: translatorFieldsToRULabels.Employe['LAST_NAME'], width:150},
+    {field:'PATRONYMIC', headerName: translatorFieldsToRULabels.Employe['PATRONYMIC'], width:150},
+    {field:'PHONE', headerName: translatorFieldsToRULabels.Employe['PHONE'], width:150},
+    {field:'POST_NAME', headerName: translatorFieldsToRULabels.Employe['POST_NAME'], width:150},
+    {field:'DEPART_NAME', headerName: translatorFieldsToRULabels.Employe['DEPART_NAME'], width:150},
+    {field:'ADDRESS', headerName: translatorFieldsToRULabels.Employe['ADDRESS'], width:150},
+    {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150},
+]
 
 const CustomExportButton = (props: ButtonProps) => 
     (<GridToolbarExportContainer {...props}>
@@ -79,7 +89,7 @@ const GridColumnMenu = forwardRef<
                         );
                     });
 
-const Employes = ({rows, columns, token, ROLE_NAME} : IEmployesPage) => {
+const Employes = ({rows, token, ROLE_NAME} : IEmployesPage) => {
     const router = useRouter();
     const gridRef = useRef<any>(null);
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
@@ -140,6 +150,7 @@ const Employes = ({rows, columns, token, ROLE_NAME} : IEmployesPage) => {
                 <DataGrid components={{Toolbar: CustomToolbar, 
                                         ColumnMenu: GridColumnMenu}} 
                     ref={gridRef} 
+                    onRowDoubleClick={e=> router.push(`/employes/${e.id}`)}
                     onSelectionModelChange={(e) => {
                             setSelectedRow(+e[0]);
                         }} 
@@ -184,16 +195,9 @@ export const getServerSideProps: GetServerSideProps  = async (ctx ) => {
             }
             const {ROLE_NAME} = (JWT.decode(`${token}`)as {user:{ROLE_NAME: string}}).user;
             console.log(ROLE_NAME.trim())
-            const columns:GridColDef[] = []
-            Object.keys(data[0]).forEach((col: string) =>{
-                if(!col.includes('_ID')){
-                    columns.push({field:col, headerName: translatorFieldsToRULabels.Employe[col], width:150})
-                }
-            });
             const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
-
             return { props: 
-                    {rows , columns, token, ROLE_NAME:ROLE_NAME.trim()} 
+                    {rows , token, ROLE_NAME:ROLE_NAME.trim()} 
                 };
         }
         catch(e){

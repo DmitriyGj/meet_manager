@@ -18,6 +18,8 @@ interface EditEmployePageProps {
     selectOptions: Buffer<{value:string, displayName:string}[]>
 };
 
+const excludeToShow= ['ROLE_NAME','POST_NAME', 'DEPART_ID','DEPART_NAME']
+
 const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
     const [currentEmployeInfo, setEmployeInfo] = useState(employeInfo);
 
@@ -52,7 +54,7 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
     return(
             <FormControl className={style.Form}>
                     {Object.keys(employeInfo).map((prop:string) =>  
-                        prop !== 'ID' && prop != 'USER_ID' && <FormLabel className={style.label}  
+                        prop !== 'ID' && prop != 'USER_ID' && !excludeToShow.includes(prop) && <FormLabel className={style.label}  
                             key={prop}
                             htmlFor={prop}>
                             {translatorFieldsToRULabels.Employe[prop]}
@@ -87,7 +89,7 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
     const {req, res} = ctx;
     const selectOptionsPosts: IPost[] = await PostAPI.getPosts();
-    const parsedSelectOptionsPosts = selectOptionsPosts.map(({ID, POST_NAME}) =>  ({value: ID, displayName: POST_NAME}));
+    const parsedSelectOptionsPosts = selectOptionsPosts.map(({POST_ID, POST_NAME}) =>  ({value: POST_ID, displayName: POST_NAME}));
     const selectOptionsRoles: IRoleResonseData[] = await RoleAPI.getRoles();
     const parsedSelectOptionsRoles = selectOptionsRoles.map(({ROLE_ID, ROLE_NAME}) =>  ({value: ROLE_ID, displayName: ROLE_NAME}));
     const token = getCookie('token',{req,res});
@@ -102,11 +104,10 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
         }
     }
     const selectOptions = {POST_ID: parsedSelectOptionsPosts,ROLE_ID:parsedSelectOptionsRoles }
-    console.log(data)
 
     return {
         props: {
-            employeInfo: data,
+            employeInfo: {...(data as IEmployeResonseData), PASSWORD:''},
             selectOptions
         }
     }

@@ -3,9 +3,10 @@ import { ChangeEventHandler, MouseEventHandler, useState } from "react";
 import AuthAPI from "../../public/src/API/AuthAPI";
 import { setCookies } from 'cookies-next';
 import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
+import {Button} from '@mui/material';
 import style from '../../public/src/Components/Froms/Login.module.scss'
 import { FormGroup, FormLabel, TextField } from "@mui/material";
+import { GetServerSideProps } from "next";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -63,5 +64,18 @@ const LoginPage = () => {
             </FormControl>
             </div>)
 }
+
+export const getServerSideProps : GetServerSideProps = async (ctx) => {
+    const token = ctx.req.cookies['token']
+    if(token){
+        return {
+            redirect: {
+                destination: '/',
+                permanent:false
+            }
+        }
+    }
+    return {props: {}}
+};
 
 export default LoginPage;

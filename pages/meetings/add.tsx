@@ -125,10 +125,7 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
         const {user} = JWT(token as string) as {user: any};
         console.log(user.ID)
         const columns:GridColDef[] = []
-        const rows = (data as IEmploye[]).map((item) => {
-            if(+item.ID !== user.ID) 
-                return {id: item.ID, ...item}
-            }).filter(item => item)
+        const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
         return {
             props: {
                 rows,columns, token

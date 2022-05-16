@@ -13,6 +13,7 @@ import { FormGroup, FormLabel, TextField, Select, MenuItem, SelectChangeEvent ,F
 import {IEmployeResonseData } from '../../../public/src/types/Employe.model';
 import { IRoleResonseData } from "../../../public/src/types/Role.model";
 import RoleAPI from "../../../public/src/API/RoleAPI";
+import JWT from 'jwt-decode'
 
 interface AddEmployePageProps {
     employeFields:IEmployeResonseData
@@ -86,8 +87,19 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     try{
         const {req, res} = ctx;
         const token = getCookie('token',{req,res});
+        const {ROLE_NAME} = (JWT(token as string) as {user:{ROLE_NAME:string}}).user
+
+        if(ROLE_NAME !== 'ADMIN'){
+            return {
+                redirect: {
+                    destination: '/employes',
+                    permanent:false
+                }
+            }
+        }
+
         const selectOptionsPosts: IPost[] = await PostAPI.getPosts();
-        const parsedSelectOptionsPosts = selectOptionsPosts.map(({ID, POST_NAME}) =>  ({value: ID, displayName: POST_NAME}));
+        const parsedSelectOptionsPosts = selectOptionsPosts.map(({POST_ID, POST_NAME}) =>  ({value: POST_ID, displayName: POST_NAME}));
         const selectOptionsRoles: IRoleResonseData[] = await RoleAPI.getRoles();
         const parsedSelectOptionsRoles = selectOptionsRoles.map(({ROLE_ID, ROLE_NAME}) =>  ({value: ROLE_ID, displayName: ROLE_NAME}));
         const selectOptions = {ROLE_ID:parsedSelectOptionsRoles, POST_ID: parsedSelectOptionsPosts };

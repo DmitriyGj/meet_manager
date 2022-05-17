@@ -13,12 +13,7 @@ import {Button } from '@mui/material';
 import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import JWT from 'jwt-decode';
-
-interface IMeeting {
-    START_DATE:Date,
-    END_DATE:Date;
-    MEMBERS: string[] | []
-}
+import IMeeting from '../../public/src/types/Meeting.model'
 
 interface IAddMeetingPage {
     rows:  GridRowsProp | any
@@ -38,7 +33,7 @@ const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['I
 ]
 
 const AddMeetingPage = ({rows, token}: IAddMeetingPage) => {
-    const [meetingInfo, setMeetingInfo] = useState<IMeeting >({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[]});
+    const [meetingInfo, setMeetingInfo] = useState<IMeeting >({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[], GUESTS:[]});
     const router = useRouter();
 
     const addClickHandler: MouseEventHandler = (e) =>  {
@@ -87,9 +82,17 @@ const AddMeetingPage = ({rows, token}: IAddMeetingPage) => {
                                             renderInput={(props) => <TextField className={style.inputPicker} {...props}/> }/>
                     </LocalizationProvider>
                 </div>
-
                     <FormLabel>
                         Участники
+                    </FormLabel>
+                    <DataGrid 
+                            onSelectionModelChange={selectEmployeHandler}
+                            checkboxSelection
+                            rows={rows} 
+                            columns={columns}/>
+                    
+                    <FormLabel>
+                        Гости
                     </FormLabel>
                     <DataGrid 
                             onSelectionModelChange={selectEmployeHandler}
@@ -122,8 +125,15 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
                 }
             }
         }
-        const {user} = JWT(token as string) as {user: any};
-        console.log(user.ID)
+        const {user} = JWT(token as string) as {user: {ID:string, ROLE_NAME:string}};
+        if(user.ROLE_NAME === 'GUEST'){
+            return {
+                redirect: {
+                    destination:'/meetings',
+                    permanent:false
+                }
+            }
+        }
         const columns:GridColDef[] = []
         const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
         return {

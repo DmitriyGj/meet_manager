@@ -12,26 +12,25 @@ import { IEmployeResonseData } from "../../../public/src/types/Employe.model";
 import {Buffer} from '../../../public/src/types/Buffer';
 import { IPost } from "../../../public/src/types/Post.model";
 import { IRoleResonseData } from "../../../public/src/types/Role.model";
+import JWT from 'jwt-decode';
 
 interface EditEmployePageProps {
     employeInfo:IEmployeResonseData,
     selectOptions: Buffer<{value:string, displayName:string}[]>
+    ROLE_NAME:string
+    ID:string
+    token:string
 };
 
-const excludeToShow= ['ROLE_NAME','POST_NAME', 'DEPART_ID','DEPART_NAME']
+const excludeToShow= ['ID', 'USER_ID' ,'ROLE_NAME','POST_NAME', 'DEPART_ID','DEPART_NAME']
 
-const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
+const AddEmployePage = ({employeInfo, selectOptions, ROLE_NAME, ID, token}: EditEmployePageProps) => {
     const [currentEmployeInfo, setEmployeInfo] = useState(employeInfo);
-
-    useEffect(() => {
-        console.log(selectOptions)
-    })
 
     const clickSendHandler: MouseEventHandler = (e) => {
         e.preventDefault();
         (async() => {
             try{
-                const token = getCookie('token')
                 await EmployeAPI.editEmploye(+employeInfo.ID, currentEmployeInfo,token as string);
             }
             catch(e){
@@ -54,7 +53,8 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
     return(
             <FormControl className={style.Form}>
                     {Object.keys(employeInfo).map((prop:string) =>  
-                        prop !== 'ID' && prop != 'USER_ID' && !excludeToShow.includes(prop) && <FormLabel className={style.label}  
+                        !( prop === 'ROLE_ID' && ROLE_NAME === 'ADMIN' && ID === employeInfo.ID ) && 
+                        !excludeToShow.includes(prop) && <FormLabel className={style.label}  
                             key={prop}
                             htmlFor={prop}>
                             {translatorFieldsToRULabels.Employe[prop]}
@@ -66,7 +66,7 @@ const AddEmployePage = ({employeInfo, selectOptions}: EditEmployePageProps) => {
                                         type='text'/> 
                                 :
                                 <Select value={currentEmployeInfo[prop]}
-                                        name='POST_ID'
+                                        name={prop}
                                         onChange={selectChangeHandler}>
                                     {selectOptions[prop]?.map(({value, displayName}) => {
                                         return <MenuItem key = {value}
@@ -94,7 +94,17 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const parsedSelectOptionsRoles = selectOptionsRoles.map(({ROLE_ID, ROLE_NAME}) =>  ({value: ROLE_ID, displayName: ROLE_NAME}));
     const token = getCookie('token',{req,res});
     const data: IEmployeResonseData | number = await EmployeAPI.getEmployeById(id as string, token as string);
-    
+    const {ROLE_NAME, ID} = (JWT(token as string) as {user:{ROLE_NAME:string, ID:string}}).user
+    if(ROLE_NAME !== 'ADMIN'){
+        return {
+            redirect: {
+                destination: '/employes',
+                permanent:false
+            }
+        }
+    }
+
+
     if(data === 401 || data === 403){
         return {
             redirect: {
@@ -107,8 +117,11 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
 
     return {
         props: {
+            ID,
+            ROLE_NAME,
             employeInfo: {...(data as IEmployeResonseData), PASSWORD:''},
-            selectOptions
+            selectOptions,
+            token
         }
     }
 };

@@ -12,14 +12,7 @@ import { Button, FormControl, FormLabel, TextField } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import translatorFieldsToRULabels from '../../../public/src/utils/translatorToRU'
 import JWT from 'jwt-decode';
-
-interface IMeeting {
-    ID:number
-    START_DATE:Date,
-    END_DATE:Date;
-    MEMBERS:  string[];
-    INICIATOR_ID: string
-}
+import IMeeting from '../../../public/src/types/Meeting.model'
 
 interface EditMeetingPageProps {
     meetingInfo:IMeeting,
@@ -37,6 +30,13 @@ const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['I
     {field:'ADDRESS', headerName: translatorFieldsToRULabels.Employe['ADDRESS'], width:150},
     {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150},
 ]
+
+const columnsGuests = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
+{field:'NAME', headerName: translatorFieldsToRULabels.Employe['NAME'], width:150},
+{field:'LAST_NAME', headerName: translatorFieldsToRULabels.Employe['LAST_NAME'], width:150},
+{field:'PATRONYMIC', headerName: translatorFieldsToRULabels.Employe['PATRONYMIC'], width:150},
+{field:'PHONE', headerName: translatorFieldsToRULabels.Employe['PHONE'], width:150},
+{field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150}]
 
 
 const EditMeetingPage = ({meetingInfo, rows}: EditMeetingPageProps) => {

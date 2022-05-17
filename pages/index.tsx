@@ -27,9 +27,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     }
     const token = ctx.req.cookies['token']
     const {user} = JWT(token) as {user: any};
-    console.log(user)
     const {ID} = user;
     const userInfo = await EmployeAPI.getEmployeById(ID, token)
+
+    if(userInfo === 401 || userInfo === 403){
+        return {
+            redirect: {
+                destination:'/login',
+                permanent:false
+            }
+        }
+    }
+    
     console.log(userInfo)
     const meetings: IMeeting[] = await EmployeAPI.getMeetingsOfEmploye(user.ID as string)
     const rows = meetings.map((item) => ({id: item.ID, ...item}))

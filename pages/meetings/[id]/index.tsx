@@ -3,6 +3,7 @@ import {GetServerSideProps } from 'next';
 import { MouseEventHandler, useState, useRef, useEffect } from "react";
 import style from '../addMeeting.module.scss';
 import EmployeAPI from '../../../public/src/API/EmployeAPI';
+import GuestAPI from  '../../../public/src/API/GeustAPI';
 import MeetingsAPI from "../../../public/src/API/MeetingsAPI";
 import { getCookie } from "cookies-next";
 import { DataGrid, GridApi, GridColDef, GridRowId, GridRowsProp } from "@mui/x-data-grid";
@@ -11,21 +12,16 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { Button, FormControl, FormLabel, TextField } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import translatorFieldsToRULabels from '../../../public/src/utils/translatorToRU'
-
-interface IMeeting {
-    ID:number
-    START_DATE:Date,
-    END_DATE:Date;
-    MEMBERS:  string[]
-}
+import IMeeting from '../../../public/src/types/Meeting.model'
 
 interface EditMeetingPageProps {
     meetingInfo:IMeeting,
-    rows: GridRowsProp ,
+    rowsEmployes: GridRowsProp ,
+    rowsGuests :GridRowsProp ,
     columns: string[] | any
 };
 
-const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
+const columnsEemployes = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
     {field:'NAME', headerName: translatorFieldsToRULabels.Employe['NAME'], width:150},
     {field:'LAST_NAME', headerName: translatorFieldsToRULabels.Employe['LAST_NAME'], width:150},
     {field:'PATRONYMIC', headerName: translatorFieldsToRULabels.Employe['PATRONYMIC'], width:150},
@@ -36,8 +32,15 @@ const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['I
     {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150},
 ]
 
+const columnsGuests = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
+{field:'NAME', headerName: translatorFieldsToRULabels.Employe['NAME'], width:150},
+{field:'LAST_NAME', headerName: translatorFieldsToRULabels.Employe['LAST_NAME'], width:150},
+{field:'PATRONYMIC', headerName: translatorFieldsToRULabels.Employe['PATRONYMIC'], width:150},
+{field:'PHONE', headerName: translatorFieldsToRULabels.Employe['PHONE'], width:150},
+{field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150}]
 
-const EditMeetingPage = ({meetingInfo, rows}: EditMeetingPageProps) => {
+
+const EditMeetingPage = ({meetingInfo, rowsEmployes, rowsGuests}: EditMeetingPageProps) => {
     const router = useRouter();
     const [currentMeetingInfo, setCurrentMeetingInfo] = useState(meetingInfo);
 
@@ -75,9 +78,17 @@ const EditMeetingPage = ({meetingInfo, rows}: EditMeetingPageProps) => {
                                         selectionModel={currentMeetingInfo.MEMBERS}
                                         checkboxSelection
                                         className={style.DataGrid} 
-                                        rows={rows} 
-                                        columns={columns}/>
-                                        
+                                        rows={rowsEmployes} 
+                                        columns={columnsEemployes}/>
+                                <FormLabel>
+                                    Гости
+                                </FormLabel>
+                                <DataGrid onRowDoubleClick={(e) =>  router.push(`/guests/${e.id}`)}
+                                        selectionModel={currentMeetingInfo.MEMBERS}
+                                        checkboxSelection
+                                        className={style.DataGrid} 
+                                        rows={rowsGuests} 
+                                        columns={columnsGuests}/>
                         </FormControl>
                     </div>
     );
@@ -93,18 +104,16 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
             notFound:true
         }
     }
-    const {MEMBERS, ...rest} = meeting;
-    const parsedMeetingInfo = {...rest, MEMBERS: MEMBERS.map(id => id.toString())} as IMeeting;
-    if(!parsedMeetingInfo){
-        return {
-            notFound:true
-        }
-    }
-    const data = await EmployeAPI.getEmployes(token as string);
-    const rows = (data as IEmploye[]).map((item) => ({id: item.ID , ...item}))
+    const {MEMBERS, GUESTS, ...rest} = meeting;
+    const parsedMeetingInfo = {...rest, MEMBERS: MEMBERS.map(id => id.toString()) , GUESTS:GUESTS.map(id => id.toString())} as IMeeting;
+    const Employes = await EmployeAPI.getEmployes(token as string);
+    const Guests = await GuestAPI.getGuests(token as string);
+    console.log(Guests)
+    const rowsEmployes = (Employes as IEmploye[]).map((item) => ({id: item.ID , ...item}))
+    const rowsGuests = (Guests as IEmploye[]).map((item) => ({id: item.ID, ...item}));
     return {
         props: {
-            meetingInfo: parsedMeetingInfo,rows,token
+            meetingInfo: parsedMeetingInfo,rowsEmployes, rowsGuests,token
         }
     }
 

@@ -3,4 +3,6 @@ export default interface IMeeting {
     START_DATE: string;
     END_DATE: string
     INICIATOR_ID:string
+    MEMBERS: string[]
+    GUESTS: string[]
 }

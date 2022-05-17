@@ -1,0 +1,16 @@
+@import '../../styles//Global.module';
+
+.Toolbar{
+    padding: 0.5%;
+    .ExportBtn {
+        color: black;
+    }
+}
+.Button {
+    border-radius: 35;
+    background-color: "gray";
+    font-size: "14px";
+    width: '10%';
+    margin: '0% 1%';
+}
+

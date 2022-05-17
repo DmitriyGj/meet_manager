@@ -1,0 +1,62 @@
+@import '../../../../styles//Global.module';
+
+.FormInfo{
+    display: flex;
+    height: 100%;
+
+    flex-direction: column;
+    padding: 2%;
+
+    *{
+        padding:  0px;
+    }
+
+    .Header {
+        align-self: baseline;
+        font-size: 25px;
+        margin-bottom: 2%;
+    }
+    .ExtendInfo {
+        width: 60%;
+        align-self: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        
+        .Header {
+            font-size: 20px;
+            margin-bottom: 0px;
+        }
+
+        .content {
+            display: flex;
+            align-self: baseline;
+            width:100%;
+
+            * {
+                margin-left: 5%;
+            }
+
+        }
+    }
+    .FormLabel {
+        display: flex;
+        flex-direction: row;
+        color:black;
+
+        > {
+            display: flex;
+        }
+
+        .Input {
+            margin-left: 5%;
+        }
+    }
+
+    .BlockWithDt{
+        margin-top: 2%;
+        display: flex;
+        flex-direction: column;
+        height: 45%;
+    }
+}

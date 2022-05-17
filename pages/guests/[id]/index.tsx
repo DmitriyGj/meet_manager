@@ -1,8 +1,7 @@
 import type { GetServerSideProps } from 'next'
-import EmployeAPI from '../../../public/src/API/EmployeAPI';
+import GuestAPI from '../../../public/src/API/GeustAPI';
 import IMeeting from '../../../public/src/types/Meeting.model';
-import { UserProfile} from '../../../public/src/Components/UserProfile/UserProfile';
-
+import { GuestProfile} from '../../../public/src/Components/GuestProfile/GuestProfile';
 
 interface UserPageProps {
     userInfo: any
@@ -11,7 +10,7 @@ interface UserPageProps {
 }
 
 const UserPage = (props: UserPageProps) => {
-    return (<UserProfile {...props}/>);
+    return (<GuestProfile {...props}/>);
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -25,8 +24,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         }
         const token = ctx.req.cookies['token']
         const {id} = ctx.query;
-        const userInfo = await EmployeAPI.getEmployeById(id as string, token)
-        
+        const userInfo = await GuestAPI.getGuestById(id as string, token)
+        console.log(userInfo)
         if(userInfo === 401 || userInfo === 403) {
             return {
                 redirect: {
@@ -41,10 +40,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
                 notFound:true
             }
         }
-        const meetings: IMeeting[] = await EmployeAPI.getMeetingsOfEmploye(id as string)
+        const meetings: IMeeting[] = await GuestAPI.getMeetingsOfGuest(id as string) || []
         const rows = meetings.map((item) => ({id: item.ID, ...item}))
-        const initedMeetings = meetings.filter(item =>  item.INICIATOR_ID.toString() === id ).map((item) => ({id: item.ID, ...item}))
-        return {props: {userInfo, meetings:rows, initedMeetings}}
+        return {props: {userInfo, meetings:rows}}
 
 
 }

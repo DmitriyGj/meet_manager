@@ -94,7 +94,7 @@ class EmployeAPI {
                 method:'PUT',
                 headers:{
                     'Content-type':'application/json',
-                    'Authoriztion':token
+                    'Authorization':token
                 },
                 body: JSON.stringify(data)
             })

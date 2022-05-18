@@ -84,7 +84,7 @@ const EditMeetingPage = ({meetingInfo, rowsEmployes, rowsGuests}: EditMeetingPag
                                     Гости
                                 </FormLabel>
                                 <DataGrid onRowDoubleClick={(e) =>  router.push(`/guests/${e.id}`)}
-                                        selectionModel={currentMeetingInfo.MEMBERS}
+                                        selectionModel={currentMeetingInfo.GUESTS}
                                         checkboxSelection
                                         className={style.DataGrid} 
                                         rows={rowsGuests} 
@@ -108,7 +108,6 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const parsedMeetingInfo = {...rest, MEMBERS: MEMBERS.map(id => id.toString()) , GUESTS:GUESTS.map(id => id.toString())} as IMeeting;
     const Employes = await EmployeAPI.getEmployes(token as string);
     const Guests = await GuestAPI.getGuests(token as string);
-    console.log(Guests)
     const rowsEmployes = (Employes as IEmploye[]).map((item) => ({id: item.ID , ...item}))
     const rowsGuests = (Guests as IEmploye[]).map((item) => ({id: item.ID, ...item}));
     return {

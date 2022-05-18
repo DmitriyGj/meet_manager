@@ -88,12 +88,13 @@ class GuestAPI {
 
     editGuest = async (employeId: number, data: any, token: string)=> {
         try{
+            console.log(token)
             const res = await fetch(`${this.baseURL}/${employeId}`,
             {
                 method:'PUT',
                 headers:{
                     'Content-type':'application/json',
-                    'Authoriztion':token
+                    'Authorization':token
                 },
                 body: JSON.stringify(data)
             })

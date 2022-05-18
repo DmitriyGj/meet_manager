@@ -8,22 +8,34 @@
     justify-content: center;
     width: 50%;
 
-    *{
-        padding: 0px;
-        margin: 0.5% auto;
+    .FormCard{
+        padding: 1% 0;
+        display: flex;
+        background-color: transparent;
+        width: 50%;
+        .FormCardContentControl {
+            width: 100%;
+            
+            *{
+                padding: 0px;
+                margin: 0  auto;
+            }
+
+        }
     }
 
     .label{
         display: flex;
         flex-direction: column;
         color:black;
-
         > {
             display: flex;
         }
 
         .input {
-            margin: 0.5%;
+            min-height: 65px;
+            margin-top: 0.5%;
+            margin-bottom: 0;
         }
     }
 

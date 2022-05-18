@@ -3,7 +3,7 @@ import styles from '../../styles/Home.module.css'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import {Button}  from '@mui/material'
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import MeetingsAPI from '../../public/src/API/MeetingsAPI';
 import { getCookie } from 'cookies-next';
 import IMeeting from '../../public/src/types/Meeting.model';
@@ -66,31 +66,30 @@ const Meetings = ({rows, token, ID, ROLE_NAME} : IMeetingsPage) => {
                     } 
                     rows={rows} columns={columns} />
             <div className = {styles.ButtonContainer}>
-                <Button variant='contained'  
-                        onClick={clickAddHandler}
-                        style={{borderRadius: 35,
-                            fontSize: "14px",
-                            width: '10%',
-                            margin: '0% 1%'}}
-                >Добавить</Button>
-                {
+                {ROLE_NAME !== 'GUEST' && <Button variant='contained'  
+                            onClick={clickAddHandler}
+                            style={{borderRadius: 35,
+                                fontSize: "14px",
+                                width: '10%',
+                                margin: '0% 1%'}}
+                    >Добавить</Button>}
+                {   
                     (ROLE_NAME === 'ADMIN' || (rows as IMeeting[]).find(item => +item.INICIATOR_ID === ID && +item.ID === selectedRow)) && 
                     (<><Button variant='contained' 
-                    onClick={clickRemoveHandler}
-                    style={{borderRadius: 35,
-                            fontSize: "14px",
-                            width: '10%',
-                            margin: '0% 1%'}}
-                    >Удалить</Button>
-                    <Button variant='contained'
-                    onClick = {clickChangeHandler}
-                    style={{borderRadius: 35,
-                            fontSize: "14px",
-                            width: '10%',
-                            margin: '0% 1%'
-                        }} >Изменить</Button></>)
+                                onClick={clickRemoveHandler}
+                                style={{borderRadius: 35,
+                                        fontSize: "14px",
+                                        width: '10%',
+                                        margin: '0% 1%'}}
+                                >Удалить</Button>
+                        <Button variant='contained'
+                                onClick = {clickChangeHandler}
+                                style={{borderRadius: 35,
+                                        fontSize: "14px",
+                                        width: '10%',
+                                        margin: '0% 1%'
+                                    }} >Изменить</Button></>)
                 }
-                                
             </div>
         </div>
     )

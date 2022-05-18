@@ -14,14 +14,15 @@ import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import JWT from 'jwt-decode';
 import IMeeting from '../../public/src/types/Meeting.model'
+import GeustAPI from "../../public/src/API/GeustAPI";
 
 interface IAddMeetingPage {
-    rows:  GridRowsProp | any
-    columns: GridColDef[] | any
+    employesRows:  GridRowsProp | any
+    guestsRows: GridRowsProp | any
     token: string
 }
 
-const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
+const employeColumns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
     {field:'NAME', headerName: translatorFieldsToRULabels.Employe['NAME'], width:150},
     {field:'LAST_NAME', headerName: translatorFieldsToRULabels.Employe['LAST_NAME'], width:150},
     {field:'PATRONYMIC', headerName: translatorFieldsToRULabels.Employe['PATRONYMIC'], width:150},
@@ -32,7 +33,15 @@ const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['I
     {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150},
 ]
 
-const AddMeetingPage = ({rows, token}: IAddMeetingPage) => {
+const gugestColumns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['ID'], width:150},
+    {field:'NAME', headerName: translatorFieldsToRULabels.Employe['NAME'], width:150},
+    {field:'LAST_NAME', headerName: translatorFieldsToRULabels.Employe['LAST_NAME'], width:150},
+    {field:'PATRONYMIC', headerName: translatorFieldsToRULabels.Employe['PATRONYMIC'], width:150},
+    {field:'PHONE', headerName: translatorFieldsToRULabels.Employe['PHONE'], width:150},
+    {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150},
+]
+
+const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => {
     const [meetingInfo, setMeetingInfo] = useState<IMeeting >({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[], GUESTS:[]});
     const router = useRouter();
 
@@ -55,6 +64,10 @@ const AddMeetingPage = ({rows, token}: IAddMeetingPage) => {
     
     const selectEmployeHandler = (e:any) => {
         setMeetingInfo({...meetingInfo, MEMBERS:e})
+    }
+
+    const selectGuestsHandler = (e:any) => {
+        setMeetingInfo({...meetingInfo, GUESTS:e})
     }
     return(
         <div className={style.main}>
@@ -88,17 +101,17 @@ const AddMeetingPage = ({rows, token}: IAddMeetingPage) => {
                     <DataGrid 
                             onSelectionModelChange={selectEmployeHandler}
                             checkboxSelection
-                            rows={rows} 
-                            columns={columns}/>
+                            rows={employesRows} 
+                            columns={employeColumns}/>
                     
                     <FormLabel>
                         Гости
                     </FormLabel>
                     <DataGrid 
-                            onSelectionModelChange={selectEmployeHandler}
+                            onSelectionModelChange={selectGuestsHandler}
                             checkboxSelection
-                            rows={rows} 
-                            columns={columns}/>
+                            rows={guestsRows} 
+                            columns={gugestColumns}/>
 
                             
                 <div className={style.ButtonBlock}>
@@ -116,8 +129,8 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     try{
         const {res,req } = ctx
         const token = getCookie('token', {req,res})
-        const data = await EmployeAPI.getEmployes(token as string);
-        if(data === 403 || data === 401){
+        const emplyoes = await EmployeAPI.getEmployes(token as string);
+        if(emplyoes === 403 || emplyoes === 401){
             return {
                 redirect: {
                     destination:'/login',
@@ -134,11 +147,13 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
                 }
             }
         }
-        const columns:GridColDef[] = []
-        const rows = (data as IEmploye[]).map((item) => ({id: item.ID, ...item}))
+        const guests = await GeustAPI.getGuests(token as string);
+
+        const employesRows = (emplyoes as IEmploye[]).map((item) => ({id: item.ID, ...item}))
+        const guestsRows = (guests as IEmploye[]).map((item) => ({id: item.ID, ...item}))
         return {
             props: {
-                rows,columns, token
+                employesRows, guestsRows, token
             }
         }
     }

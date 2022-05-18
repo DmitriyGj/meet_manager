@@ -3,6 +3,7 @@ import {GetServerSideProps } from 'next';
 import { MouseEventHandler, useState, useRef, useEffect } from "react";
 import style from '../addMeeting.module.scss';
 import EmployeAPI from '../../../public/src/API/EmployeAPI';
+import GuestAPI from '../../../public/src/API/GeustAPI';
 import MeetingsAPI from "../../../public/src/API/MeetingsAPI";
 import { getCookie } from "cookies-next";
 import { DataGrid, GridApi, GridColDef, GridRowId, GridRowsProp } from "@mui/x-data-grid";
@@ -16,7 +17,8 @@ import IMeeting from '../../../public/src/types/Meeting.model'
 
 interface EditMeetingPageProps {
     meetingInfo:IMeeting,
-    rows: GridRowsProp ,
+    employesRows: GridRowsProp ,
+    guestsRows: GridRowsProp
     columns: string[] | any
 };
 
@@ -39,12 +41,17 @@ const columnsGuests = [{ field:'ID', headerName: translatorFieldsToRULabels.Empl
 {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150}]
 
 
-const EditMeetingPage = ({meetingInfo, rows}: EditMeetingPageProps) => {
+const EditMeetingPage = ({meetingInfo,employesRows, guestsRows}: EditMeetingPageProps) => {
     const router = useRouter();
     const [currentMeetingInfo, setCurrentMeetingInfo] = useState(meetingInfo);
 
     const selectEmployeHandler = (e:any[]) =>{
         setCurrentMeetingInfo({...currentMeetingInfo, MEMBERS: e});
+    }
+
+    
+    const selectGuestsHandler = (e:any[]) =>{
+        setCurrentMeetingInfo({...currentMeetingInfo, GUESTS: e});
     }
 
 
@@ -97,7 +104,16 @@ const EditMeetingPage = ({meetingInfo, rows}: EditMeetingPageProps) => {
                                         onSelectionModelChange={selectEmployeHandler}
                                         checkboxSelection
                                         className={style.DataGrid} 
-                                        rows={rows} 
+                                        rows={employesRows} 
+                                        columns={columns}/>
+                                <FormLabel>
+                                    Гости
+                                </FormLabel>
+                                <DataGrid selectionModel={currentMeetingInfo.GUESTS}
+                                        onSelectionModelChange={selectGuestsHandler}
+                                        checkboxSelection
+                                        className={style.DataGrid} 
+                                        rows={guestsRows} 
                                         columns={columns}/>
                                         
                             <div className={style.ButtonBlock}>
@@ -114,10 +130,10 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
     const {req, res} = ctx;
     const token = getCookie('token',{req,res});
-    const data = await EmployeAPI.getEmployes(token as string);
-    const {MEMBERS, ...rest} = await MeetingsAPI.getMeetingById(id as string, token as string) as IMeeting;
+    const employesData = await EmployeAPI.getEmployes(token as string);
+    const {MEMBERS, GUESTS, ...rest} = await MeetingsAPI.getMeetingById(id as string, token as string) as IMeeting;
     const {ID, ROLE_NAME} = (JWT(token as string) as {user: {ID:string, ROLE_NAME:string}}).user
-    if(data === 401 || data === 403){
+    if(employesData === 401 || employesData === 403){
         return {
             redirect: {
                 destination: '/login',
@@ -133,11 +149,13 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
             }
         }
     }
-    const parsedMeetingInfo = {...rest, MEMBERS: MEMBERS.map(id => id.toString())} as IMeeting;
-    const rows = (data as IEmploye[]).map((item) => ({id: item.ID , ...item}))
+    const guestsData = await GuestAPI.getGuests(token as string);
+    const parsedMeetingInfo = {...rest, MEMBERS: MEMBERS.map(id => id.toString()), GUESTS: GUESTS.map(id => id.toString())} as IMeeting;
+    const employesRows = (employesData as IEmploye[]).map((item) => ({id: item.ID , ...item}))
+    const guestsRows = (guestsData as IEmploye[]).map((item) => ({id: item.ID , ...item}))
     return {
         props: {
-            meetingInfo: parsedMeetingInfo,rows,token
+            meetingInfo: parsedMeetingInfo, employesRows, guestsRows,token
         }
     }
 

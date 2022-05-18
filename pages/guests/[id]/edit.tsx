@@ -1,32 +1,31 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import {  ChangeEventHandler, MouseEventHandler, ReactNode, useEffect, useState } from "react";
+import {  ChangeEventHandler, MouseEventHandler, useState } from "react";
 import style from '../addEmploye.module.scss';
-import EmployeAPI from '../../../public/src/API/EmployeAPI';
+import GuestAPI from '../../../public/src/API/GeustAPI';
 import translatorFieldsToRULabels from "../../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
-import { Button, FormControl, FormGroup, FormLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { Button, Card, FormControl, FormGroup, FormLabel,TextField } from "@mui/material";
 import { IEmployeResonseData } from "../../../public/src/types/Employe.model";
 import JWT from 'jwt-decode';
 import GeustAPI from "../../../public/src/API/GeustAPI";
+import { Formik } from 'formik';
+import { GuestValidationSchema } from "../../../public/src/utils/validationSchemas";
 
 interface EditGUestPageProps {
     guestInfo:IEmployeResonseData,
     ID:string
     ROLE_NAME:string
+    token: string
 };
 
-const excludeToShow= ['ID', 'USER_ID' ,'ROLE_NAME', 'ROLE_ID']
+const excludeToShow= ['ID', 'USER_ID' ,'ROLE_NAME', 'ROLE_ID', 'LOGIN']
 
-const AddEmployePage = ({guestInfo}: EditGUestPageProps) => {
-    const [currentGuestInfo, setGuestInfo] = useState(guestInfo);
-
-    const clickSendHandler: MouseEventHandler = (e) => {
-        e.preventDefault();
+const AddEmployePage = ({guestInfo,token}: EditGUestPageProps) => {
+    const SubmitHandler= (values : IEmployeResonseData) => {
         (async() => {
             try{
-                const token = getCookie('token')
-                await GeustAPI.editGuest(+guestInfo.ID, currentGuestInfo,token as string);
+                await GeustAPI.editGuest(+guestInfo.ID, values,token as string);
             }
             catch(e){
                 alert('что-то пошло не так')
@@ -37,42 +36,59 @@ const AddEmployePage = ({guestInfo}: EditGUestPageProps) => {
 
         })();
     };
-    const inputChangeHandler:ChangeEventHandler<HTMLInputElement> =  ({target}) =>  {
-        setGuestInfo({...currentGuestInfo,[target.name]:target.value})
-    };
-
+    console.log(guestInfo)
     const router = useRouter();
-    return(
-            <FormControl className={style.Form}>
-                    {Object.keys(guestInfo).map((prop:string) =>  
-                        !excludeToShow.includes(prop) && <FormLabel className={style.label}  
-                            key={prop}
-                            htmlFor={prop}>
-                            {translatorFieldsToRULabels.Employe[prop]}
-                                <TextField className={style.input}  
-                                    onChange= {inputChangeHandler}
-                                    value={currentGuestInfo[prop]}
-                                    name={prop} 
-                                    type='text'/> 
-                        </FormLabel>)
+    return(<Formik initialValues={guestInfo}
+                    validationSchema={GuestValidationSchema}
+                    onSubmit={values => SubmitHandler(values) }>
+                    {({errors, touched, values, handleChange, handleBlur, handleSubmit}) =>
+                        ( <form className={style.Form} onSubmit={handleSubmit} >
+                            <Card className={style.FormCard}>
+                                <FormControl className={style.FormCardContentControl} >
+                                        {Object.keys(values).map((prop:string) => { 
+                                            return( !excludeToShow.includes(prop) &&<FormLabel className={style.label}  
+                                                key={prop}
+                                                htmlFor={prop}>
+                                                {translatorFieldsToRULabels.Employe[prop]}
+                                                    <TextField id={prop}
+                                                        onBlur={handleBlur}
+                                                        className={style.input} 
+                                                        error={touched[prop] && Boolean(errors[prop])}  
+                                                        helperText = {touched[prop] ? errors[prop] : ''}
+                                                        value={values[prop]}
+                                                        onChange={handleChange}
+                                                        name={prop} 
+                                                        type='text'/> 
+                                            </FormLabel>)
+                                            })
+                                        }
+                                    <FormGroup className={style.ButtonBlock}>
+                                        <Button className={style.Button} 
+                                                type='submit' 
+                                                onClick = {e => {e.preventDefault(); handleSubmit()} } 
+                                                variant='contained'>Send</Button>
+                                        <Button onClick={() => router.push('/guests')}
+                                                className={style.Button} 
+                                                variant='contained'> Cancel</Button>
+                                    </FormGroup>
+                                </FormControl>
+                        </Card>
+                    </form>)
                     }
-                <FormGroup className={style.ButtonBlock}>
-                    <Button className={style.Button} variant='contained' onClick={clickSendHandler}>Send</Button>
-                </FormGroup>
-            </FormControl>
-    );
+        </Formik>);
 }
 
 export const getServerSideProps : GetServerSideProps = async(ctx) => {
     const {id} = ctx.query;
     const {req, res} = ctx;
     const token = getCookie('token',{req,res});
-    const data: IEmployeResonseData | number = await EmployeAPI.getEmployeById(id as string, token as string);
+    console.log(token)
+    const data: IEmployeResonseData | number = await GuestAPI.getGuestById(id as string, token as string);
     const {ROLE_NAME, ID} = (JWT(token as string) as {user:{ROLE_NAME:string, ID:string}}).user
     if(ROLE_NAME === 'GUEST'){
         return {
             redirect: {
-                destination: '/guests',
+                destination: `/guests/${id}`,
                 permanent:false
             }
         }
@@ -92,7 +108,8 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
         props: {
             ID,
             ROLE_NAME,
-            geustInfo: {...(data as IEmployeResonseData), PASSWORD:''},
+            guestInfo: {...(data as IEmployeResonseData), PASSWORD:''},
+            token
         }
     }
 };

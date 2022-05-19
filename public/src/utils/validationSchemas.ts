@@ -20,10 +20,15 @@ const EmployeValidationSchema = yup.object().shape({
     LOGIN:yup.string().required('Reqired'),
     PATRONYMIC:yup.string().required('Reqired'),
     PHONE:yup.string().required('Reqired').matches(phoneRegExp, 'Phone is not valid'),
-    POST_ID:yup.string(),
-    ROLE_ID:yup.string(),
+    POST_ID:yup.string().required(),
+    ROLE_ID:yup.string().required(),
     ADDRESS:yup.string()
 });
 
+const LoginValidationSchema = yup.object().shape({
+    LOGIN: yup.string().required('Required'),
+    PASSWORD:yup.string().required('Reqiered')
+});
 
-export {GuestValidationSchema, EmployeValidationSchema};
+
+export {GuestValidationSchema, EmployeValidationSchema, LoginValidationSchema};

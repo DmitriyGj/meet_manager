@@ -1,18 +1,19 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import {  ChangeEventHandler, MouseEventHandler, ReactNode, useEffect, useState } from "react";
 import style from '../addEmploye.module.scss';
 import EmployeAPI from '../../../public/src/API/EmployeAPI';
 import PostAPI from "../../../public/src/API/PostAPI";
 import RoleAPI from "../../../public/src/API/RoleAPI";
 import translatorFieldsToRULabels from "../../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
-import { Button, FormControl, FormGroup, FormLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import { Button, Card, FormControl, FormGroup, FormLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { IEmployeResonseData } from "../../../public/src/types/Employe.model";
 import {Buffer} from '../../../public/src/types/Buffer';
 import { IPost } from "../../../public/src/types/Post.model";
 import { IRoleResonseData } from "../../../public/src/types/Role.model";
 import JWT from 'jwt-decode';
+import { Form, Formik } from "formik";
+import { EmployeValidationSchema } from "../../../public/src/utils/validationSchemas";
 
 interface EditEmployePageProps {
     employeInfo:IEmployeResonseData,
@@ -25,13 +26,11 @@ interface EditEmployePageProps {
 const excludeToShow= ['ID', 'USER_ID' ,'ROLE_NAME','POST_NAME', 'DEPART_ID','DEPART_NAME']
 
 const AddEmployePage = ({employeInfo, selectOptions, ROLE_NAME, ID, token}: EditEmployePageProps) => {
-    const [currentEmployeInfo, setEmployeInfo] = useState(employeInfo);
 
-    const clickSendHandler: MouseEventHandler = (e) => {
-        e.preventDefault();
+    const editHandler = (values: IEmployeResonseData) => {
         (async() => {
             try{
-                await EmployeAPI.editEmploye(+employeInfo.ID, currentEmployeInfo,token as string);
+                await EmployeAPI.editEmploye(+employeInfo.ID, values,token as string);
             }
             catch(e){
                 alert('что-то пошло не так')
@@ -42,47 +41,47 @@ const AddEmployePage = ({employeInfo, selectOptions, ROLE_NAME, ID, token}: Edit
 
         })();
     };
-    const inputChangeHandler:ChangeEventHandler<HTMLInputElement> =  ({target}) =>  {
-        setEmployeInfo({...currentEmployeInfo,[target.name]:target.value})
-    };
-
-    const selectChangeHandler = ({target}: SelectChangeEvent<string>, child: ReactNode) => {setEmployeInfo({...currentEmployeInfo,[target.name]:target.value}); };
-    
-
     const router = useRouter();
-    return(
-            <FormControl className={style.Form}>
-                    {Object.keys(employeInfo).map((prop:string) =>  
-                        !( prop === 'ROLE_ID' && ROLE_NAME === 'ADMIN' && ID === employeInfo.ID ) && 
-                        !excludeToShow.includes(prop) && <FormLabel className={style.label}  
-                            key={prop}
-                            htmlFor={prop}>
-                            {translatorFieldsToRULabels.Employe[prop]}
-                                {!prop.includes('_ID') ?
-                                    <TextField className={style.input}  
-                                        onChange= {inputChangeHandler}
-                                        value={currentEmployeInfo[prop]}
-                                        name={prop} 
-                                        type='text'/> 
-                                :
-                                <Select value={currentEmployeInfo[prop]}
-                                        name={prop}
-                                        onChange={selectChangeHandler}>
-                                    {selectOptions[prop]?.map(({value, displayName}) => {
-                                        return <MenuItem key = {value}
-                                                    value = {value}>
-                                                    {displayName}
-                                                </MenuItem >
-                                    })}
-                                </Select>
-                            }
-                        </FormLabel>)
+    return(<Formik initialValues={employeInfo}
+            validationSchema={EmployeValidationSchema}
+            onSubmit={(values) => editHandler(values)}>
+    {({errors, values, touched, handleChange, handleSubmit, handleBlur})=>
+        <Form className={style.Form} onSubmit={handleSubmit}>
+            <FormLabel>
+                Изменение работника
+            </FormLabel>
+            <Card className={style.Card}>
+                <FormControl className={style.FormControl}>
+                    
+                    {Object.keys(values).map((prop:string) =>
+                            (!excludeToShow.includes(prop) && <TextField className={style.input}
+                                    onBlur={handleBlur}
+                                    helperText={touched[prop] ? errors[prop]: ''}
+                                    key={prop} 
+                                    error={touched[prop] && Boolean(errors[prop])} 
+                                    label ={translatorFieldsToRULabels.Employe[prop]}
+                                    onChange= {handleChange}
+                                    select={prop.includes('_ID') }
+                                    value={values[prop]}
+                                    id={prop}
+                                    name={prop} 
+                                    type='text'>
+                                        {prop.includes('_ID') && selectOptions[prop].map(({value, displayName}) =>
+                                                            (<MenuItem key = {value}
+                                                                    value = {value}>{displayName}</MenuItem>))
+                                                                }
+                                    </TextField>)) 
                     }
-                <FormGroup className={style.ButtonBlock}>
-                    <Button className={style.Button} variant='contained' onClick={clickSendHandler}>Send</Button>
-                </FormGroup>
-            </FormControl>
-    );
+                    <FormGroup className={style.ButtonBlock}>
+                        <Button className={style.Button} 
+                                    type='submit'
+                                    variant='contained'>Send</Button>
+                        <Button className={style.Button} variant='contained'> Cancel</Button>
+                    </FormGroup>
+                </FormControl>
+            </Card>
+        </Form>}
+    </Formik> );
 }
 
 export const getServerSideProps : GetServerSideProps = async(ctx) => {

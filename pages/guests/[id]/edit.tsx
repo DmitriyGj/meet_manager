@@ -5,11 +5,11 @@ import style from '../addEmploye.module.scss';
 import GuestAPI from '../../../public/src/API/GeustAPI';
 import translatorFieldsToRULabels from "../../../public/src/utils/translatorToRU";
 import { getCookie } from "cookies-next";
-import { Button, Card, FormControl, FormGroup, FormLabel,TextField } from "@mui/material";
+import { Button, Card, FormControl, FormGroup, FormLabel,MenuItem,TextField } from "@mui/material";
 import { IEmployeResonseData } from "../../../public/src/types/Employe.model";
 import JWT from 'jwt-decode';
 import GeustAPI from "../../../public/src/API/GeustAPI";
-import { Formik } from 'formik';
+import { Formik,Form } from 'formik';
 import { GuestValidationSchema } from "../../../public/src/utils/validationSchemas";
 
 interface EditGUestPageProps {
@@ -39,43 +39,39 @@ const AddEmployePage = ({guestInfo,token}: EditGUestPageProps) => {
     console.log(guestInfo)
     const router = useRouter();
     return(<Formik initialValues={guestInfo}
-                    validationSchema={GuestValidationSchema}
-                    onSubmit={values => SubmitHandler(values) }>
-                    {({errors, touched, values, handleChange, handleBlur, handleSubmit}) =>
-                        ( <form className={style.Form} onSubmit={handleSubmit} >
-                            <Card className={style.FormCard}>
-                                <FormControl className={style.FormCardContentControl} >
-                                        {Object.keys(values).map((prop:string) => { 
-                                            return( !excludeToShow.includes(prop) &&<FormLabel className={style.label}  
-                                                key={prop}
-                                                htmlFor={prop}>
-                                                {translatorFieldsToRULabels.Employe[prop]}
-                                                    <TextField id={prop}
-                                                        onBlur={handleBlur}
-                                                        className={style.input} 
-                                                        error={touched[prop] && Boolean(errors[prop])}  
-                                                        helperText = {touched[prop] ? errors[prop] : ''}
-                                                        value={values[prop]}
-                                                        onChange={handleChange}
-                                                        name={prop} 
-                                                        type='text'/> 
-                                            </FormLabel>)
-                                            })
-                                        }
-                                    <FormGroup className={style.ButtonBlock}>
-                                        <Button className={style.Button} 
-                                                type='submit' 
-                                                onClick = {e => {e.preventDefault(); handleSubmit()} } 
-                                                variant='contained'>Send</Button>
-                                        <Button onClick={() => router.push('/guests')}
-                                                className={style.Button} 
-                                                variant='contained'> Cancel</Button>
-                                    </FormGroup>
-                                </FormControl>
-                        </Card>
-                    </form>)
-                    }
-        </Formik>);
+                validationSchema={GuestValidationSchema}
+                onSubmit={(values) => SubmitHandler(values)}>
+        {({errors, values, touched, handleChange, handleSubmit, handleBlur})=>
+            <Form className={style.Form} onSubmit={handleSubmit}>
+                <FormLabel>
+                    Изменение данных о госте
+                </FormLabel>
+                <Card className={style.Card}>
+                    <FormControl className={style.FormControl}>
+                        {Object.keys(values).map((prop:string) =>
+                                (!excludeToShow.includes(prop) && <TextField className={style.input}
+                                        onBlur={handleBlur}
+                                        helperText={touched[prop] ? errors[prop]: ''}
+                                        key={prop} 
+                                        error={touched[prop] && Boolean(errors[prop])} 
+                                        label ={translatorFieldsToRULabels.Employe[prop]}
+                                        onChange= {handleChange}
+                                        value={values[prop]}
+                                        id={prop}
+                                        name={prop} 
+                                        type='text'>
+                                        </TextField>)) 
+                        }
+                        <FormGroup className={style.ButtonBlock}>
+                            <Button className={style.Button} 
+                                        type='submit'
+                                        variant='contained'>Send</Button>
+                            <Button className={style.Button} variant='contained'> Cancel</Button>
+                        </FormGroup>
+                    </FormControl>
+                </Card>
+            </Form>}
+        </Formik> );
 }
 
 export const getServerSideProps : GetServerSideProps = async(ctx) => {

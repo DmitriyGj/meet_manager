@@ -2,15 +2,14 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-
+    background-color: #67c2e68a;
+    
     .Layout{
         box-sizing: border-box;
         display: grid;
         grid-template-columns: 30% 70%;
-        grid-template-rows: 10% 1fr 10%;
-        background-color: #5490a88a;
-        height: 100vh;
-
+        grid-template-rows: 10% 5fr 1fr;
+        min-height: 100vh;
         > * {
             box-sizing: border-box;
             margin: 0;
@@ -24,8 +23,8 @@
         
         .Footer{
             grid-column:1/-1;
-            grid-row:3/-1;
-    
+            grid-row:3/4;
+
         }
         .Body{
             grid-column: 1/-1;

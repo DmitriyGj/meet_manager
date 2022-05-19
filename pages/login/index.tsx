@@ -9,16 +9,16 @@ import { FormGroup, FormLabel, TextField } from "@mui/material";
 import { GetServerSideProps } from "next";
 import JWT from 'jwt-decode';
 import { removeCookies } from "cookies-next";
+import { Formik } from 'formik';
+import { LoginValidationSchema } from "../../public/src/utils/validationSchemas";
 
 const LoginPage = () => {
     const router = useRouter();
-    const [userInfo, setUserInfo] = useState({LOGIN:'', PASSWORD:''});
-    const changeInputHandler:ChangeEventHandler<HTMLInputElement> = ({target}) => setUserInfo({...userInfo,[target.name]: target.value})
-    const clickLoginHandler: MouseEventHandler  = (e) => {
-        e.preventDefault();
+    const userInfo = {LOGIN:'', PASSWORD:''};
+    const loginHandler= (values: {LOGIN:string, PASSWORD:string}) => {
         (async() => {
             try {
-                const token = await AuthAPI.authUser(userInfo) as string;
+                const token = await AuthAPI.authUser(values) as string;
                 if(token){
                     setCookies('token', token)
                     router.push('/')
@@ -32,39 +32,35 @@ const LoginPage = () => {
     }
     
     return(
-        <div className={style.main}>
-            <FormControl className={style.Form}>
-                <FormGroup>
-                    <FormLabel className={style.label}
-                        htmlFor="LOGIN">
-                        Login
-                        <TextField className={style.input} 
-                            id='LOGIN' 
-                            name="LOGIN" 
-                            type="text" 
-                            onChange={changeInputHandler} 
-                            value={userInfo.LOGIN} />
-                    </FormLabel>
-
-                </FormGroup>
-                <FormGroup>
-                    <FormLabel className={style.label}
-                        htmlFor="PASSWORD">
-                        Password
-                        <TextField className={style.input}
-                            id='PASSWORD' 
-                            name="PASSWORD" 
-                            type="password" 
-                            onChange={changeInputHandler} 
-                            value={userInfo.PASSWORD} />
-                    </FormLabel>
-
-                </FormGroup>
-                <FormGroup>
-                <   Button fullWidth variant='contained' onClick={clickLoginHandler}>Login</Button>
-                </FormGroup>
-            </FormControl>
-            </div>)
+        <Formik initialValues={userInfo} 
+            validationSchema = {LoginValidationSchema}
+            onSubmit = {values => loginHandler(values) }>
+            {({errors, touched, values, handleChange, handleBlur, handleSubmit}) =>
+            <form className={style.main} onSubmit={handleSubmit}>
+                <FormControl className={style.Form}>
+                            <TextField className={style.input} 
+                                label='Login'
+                                id='LOGIN' 
+                                name="LOGIN" 
+                                type="text"
+                                error ={touched.LOGIN && Boolean(errors.LOGIN)}
+                                helperText={touched.LOGIN && errors.LOGIN} 
+                                onBlur={handleBlur}
+                                onChange={handleChange} 
+                                value={values.LOGIN} />
+                            <TextField className={style.input}
+                                error ={ touched.PASSWORD && Boolean(errors.PASSWORD)}
+                                helperText={ touched.PASSWORD && errors.PASSWORD}
+                                label='Password'
+                                id='PASSWORD' 
+                                name="PASSWORD" 
+                                type="password" 
+                                onChange={handleChange} 
+                                value={values.PASSWORD} />
+                        <Button type='submit' variant='contained' >Login</Button>
+                    </FormControl>
+                </form>}
+        </Formik>)
 }
 
 export const getServerSideProps : GetServerSideProps = async (ctx) => {

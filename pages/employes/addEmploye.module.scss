@@ -6,43 +6,32 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 50%;
-
-    .FormCard{
-        padding: 1% 0;
-        display: flex;
-        background-color: transparent;
-        justify-content: center;
-        align-items: center;
-        width: 50%;
-        .FormCardContentControl {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            
-            *{
-                padding: 0;
-                margin-bottom: 0.5%;
-
-            }
-
-        }
+    width: 100%;
+    .FromControl{
+        width:50%;
+        padding:0px;
     }
 
-    .label{
-        display: flex;
-        flex-direction: column;
-        color:black;
-        width: 50%;
+    .Card {
+        width: 30%;
+        display:flex;
+        justify-content: center;
+        background-color:transparent;
+        box-sizing:border-box;
+        padding: auto 5%;
+    }
 
-        > {
-            display: flex;
-        }
 
-        .input {
-            min-height: 45px;
-            margin: 0.5%;
+    > {
+        margin: 5%;
+    }
+
+    .input {
+        min-height: 75px;
+        max-height: 90px;
+        margin: 5%;
+        * > {
+            padding: 5px;
         }
     }
 
@@ -51,7 +40,7 @@
         display: flex;  
         justify-content: space-around;
         flex-direction: row;
-        width: 50%;
+        margin: 5%;
     }
 }
     

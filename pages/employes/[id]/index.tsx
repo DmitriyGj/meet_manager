@@ -15,7 +15,9 @@ const UserPage = (props: UserPageProps) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-        if(!ctx.req.cookies['token'] ){
+
+        const token = ctx.req.cookies['token']
+        if(!token ){
             return {
                 redirect: {
                     destination:'/login',
@@ -23,14 +25,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
                 }
             }
         }
-        const token = ctx.req.cookies['token']
         const {id} = ctx.query;
         const userInfo = await EmployeAPI.getEmployeById(id as string, token)
         
         if(userInfo === 401 || userInfo === 403) {
             return {
                 redirect: {
-                    dstination: '/login',
+                    destination: '/login',
                     permanent:false
                 }
             }
@@ -43,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         }
         const meetings: IMeeting[] = await EmployeAPI.getMeetingsOfEmploye(id as string)
         const rows = meetings.map((item) => ({id: item.ID, ...item}))
-        const initedMeetings = meetings.filter(item =>  item.INICIATOR_ID.toString() === id ).map((item) => ({id: item.ID, ...item}))
+        const initedMeetings = meetings.filter(item =>  item?.INICIATOR_ID?.toString() === id ).map((item) => ({id: item.ID, ...item}))
         return {props: {userInfo, meetings:rows, initedMeetings}}
 
 

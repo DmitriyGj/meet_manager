@@ -14,7 +14,9 @@ const UserPage = (props: UserPageProps) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-        if(!ctx.req.cookies['token'] ){
+        const token = ctx.req.cookies['token']
+
+        if(!token ){
             return {
                 redirect: {
                     destination:'/login',
@@ -22,14 +24,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
                 }
             }
         }
-        const token = ctx.req.cookies['token']
         const {id} = ctx.query;
         const userInfo = await GuestAPI.getGuestById(id as string, token)
         console.log(userInfo)
         if(userInfo === 401 || userInfo === 403) {
             return {
                 redirect: {
-                    dstination: '/login',
+                    destination: '/login',
                     permanent:false
                 }
             }

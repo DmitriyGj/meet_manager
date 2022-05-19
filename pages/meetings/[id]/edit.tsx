@@ -60,7 +60,7 @@ const EditMeetingPage = ({meetingInfo,employesRows, guestsRows}: EditMeetingPage
         (async() => {
             try{
                 const token = getCookie('token')
-                await MeetingsAPI.editMeeting(+meetingInfo.ID, currentMeetingInfo,token as string);
+                await MeetingsAPI.editMeeting(+meetingInfo?.ID, currentMeetingInfo,token as string);
             }
             catch(e){
                 alert('что-то пошло не так')

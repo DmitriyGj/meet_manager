@@ -7,6 +7,8 @@ import {Button} from '@mui/material';
 import style from '../../public/src/Components/Froms/Login.module.scss'
 import { FormGroup, FormLabel, TextField } from "@mui/material";
 import { GetServerSideProps } from "next";
+import JWT from 'jwt-decode';
+import { removeCookies } from "cookies-next";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -66,16 +68,27 @@ const LoginPage = () => {
 }
 
 export const getServerSideProps : GetServerSideProps = async (ctx) => {
-    const token = ctx.req.cookies['token']
-    if(token){
-        return {
-            redirect: {
-                destination: '/',
-                permanent:false
+    const { req, res } = ctx;
+    try{
+        const token = req.cookies['token'];
+        const decodeToken = JWT(token as string);
+        if(!decodeToken){
+            return {
+                redirect: {
+                    destination: '/',
+                    permanent:false
+                }
             }
         }
+        return {props: {}}
     }
-    return {props: {}}
+    catch(e){
+        removeCookies('token', {req,res})
+        return {
+            props:{}
+        }
+    }
+
 };
 
 export default LoginPage;

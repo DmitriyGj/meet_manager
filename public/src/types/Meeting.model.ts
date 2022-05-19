@@ -1,8 +1,8 @@
 export default interface IMeeting {
-    ID: string;
-    START_DATE: string;
-    END_DATE: string
-    INICIATOR_ID:string
-    MEMBERS: string[]
-    GUESTS: string[]
+    ID: string | never ;
+    START_DATE: Date;
+    END_DATE: Date
+    INICIATOR_ID:string | never
+    MEMBERS: string[] | never[]
+    GUESTS: string[] | never[]
 }

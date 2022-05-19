@@ -10,14 +10,16 @@ import {IEmployeResonseData } from '../../../public/src/types/Employe.model';
 import JWT from 'jwt-decode'
 import { Formik, Form } from 'formik';
 import { GuestValidationSchema } from "../../../public/src/utils/validationSchemas";
+import { IRoleResonseData } from "../../../public/src/types/Role.model";
 
 interface AddEmployePageProps {
     token: string
 };
 
 const AddEmployePage = ({ token}: AddEmployePageProps) => {
+    const guestInfo = InitValues.GuestInfo as unknown as IEmployeResonseData
     const router = useRouter();
-    const addClickHandler = (values: IEmployeResonseData) =>  {
+    const addClickHandler = (values:IEmployeResonseData) =>  {
         (async() => {
             try{
                 await GuestInfo.addGuest(values, token);
@@ -33,9 +35,9 @@ const AddEmployePage = ({ token}: AddEmployePageProps) => {
     }
 
     return(
-        <Formik initialValues={InitValues.GuestInfo }
+        <Formik initialValues={guestInfo }
                 validationSchema={GuestValidationSchema}
-                onSubmit={(values: IEmployeResonseData) => addClickHandler(values)}>
+                onSubmit={(values) => addClickHandler(values)}>
             {({errors, values, touched, handleChange, handleSubmit, handleBlur})=>
                 <Form className={style.Form} onSubmit={handleSubmit}>
                     <FormLabel>

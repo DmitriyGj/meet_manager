@@ -9,7 +9,7 @@ const GuestValidationSchema = yup.object().shape({
     PASSWORD: yup.string().min(4, 'Password must contain as least 4 characters').required('Eneter the password'),
     LOGIN:yup.string().required('Reqired'),
     PATRONYMIC:yup.string().required('Reqired'),
-    PHONE:yup.string().required('Reqired').matches(phoneRegExp, 'Phone is not valid')
+    PHONE:yup.string().required('Reqired').matches(phoneRegExp, 'Phone is not valid'),
 });
 
 const EmployeValidationSchema = yup.object().shape({

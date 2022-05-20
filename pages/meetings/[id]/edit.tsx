@@ -14,6 +14,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import translatorFieldsToRULabels from '../../../public/src/utils/translatorToRU'
 import JWT from 'jwt-decode';
 import IMeeting from '../../../public/src/types/Meeting.model'
+import {isAfter} from 'date-fns'
 
 interface EditMeetingPageProps {
     meetingInfo:IMeeting,
@@ -43,7 +44,7 @@ const columnsGuests = [{ field:'ID', headerName: translatorFieldsToRULabels.Empl
 
 const EditMeetingPage = ({meetingInfo,employesRows, guestsRows}: EditMeetingPageProps) => {
     const router = useRouter();
-    const [currentMeetingInfo, setCurrentMeetingInfo] = useState(meetingInfo);
+    const [currentMeetingInfo, setCurrentMeetingInfo] = useState<IMeeting>(meetingInfo);
 
     const selectEmployeHandler = (e:any[]) =>{
         setCurrentMeetingInfo({...currentMeetingInfo, MEMBERS: e});
@@ -57,19 +58,21 @@ const EditMeetingPage = ({meetingInfo,employesRows, guestsRows}: EditMeetingPage
 
     const clickSendHandler: MouseEventHandler = (e) => {
         e.preventDefault();
-        (async() => {
-            try{
-                const token = getCookie('token')
-                await MeetingsAPI.editMeeting(+meetingInfo?.ID, currentMeetingInfo,token as string);
-            }
-            catch(e){
-                alert('что-то пошло не так')
-            }
-            finally{
-                router.push('/meetings')
-            }
+        if(isAfter(currentMeetingInfo.END_DATE, currentMeetingInfo.START_DATE)){
+            (async() => {
+                try{
+                    const token = getCookie('token')
+                    await MeetingsAPI.editMeeting(+meetingInfo?.ID, currentMeetingInfo,token as string);
+                }
+                catch(e){
+                    alert('что-то пошло не так')
+                }
+                finally{
+                    router.push('/meetings')
+                }
 
-        })();
+            })();
+        }
     };
 
     return(<div className={style.main}>
@@ -84,8 +87,11 @@ const EditMeetingPage = ({meetingInfo,employesRows, guestsRows}: EditMeetingPage
                                                                 setCurrentMeetingInfo({...currentMeetingInfo,START_DATE:date});
                                                             }
                                                         }}  
-                                                        value={meetingInfo.START_DATE} 
-                                                        renderInput={(props) => <TextField className={style.inputPicker} {...props}/> } />
+                                                        value={currentMeetingInfo.START_DATE} 
+                                                        renderInput={(props) => <TextField 
+                                                                helperText={isAfter(currentMeetingInfo.START_DATE, currentMeetingInfo.END_DATE) && 'Дата начала не может быть позже конца'}
+                                                                error={isAfter(currentMeetingInfo.START_DATE, currentMeetingInfo.END_DATE)}
+                                                                className={style.inputPicker} {...props}/> } />
                                         
                                         <DateTimePicker label='Конец встречи' 
                                                         onChange={(date) => {
@@ -100,22 +106,25 @@ const EditMeetingPage = ({meetingInfo,employesRows, guestsRows}: EditMeetingPage
                                 <FormLabel>
                                     Участники
                                 </FormLabel>
-                                <DataGrid selectionModel={currentMeetingInfo.MEMBERS}
-                                        onSelectionModelChange={selectEmployeHandler}
-                                        checkboxSelection
-                                        className={style.DataGrid} 
-                                        rows={employesRows} 
-                                        columns={columns}/>
+
+                                <div  className={style.dt}>
+                                    <DataGrid selectionModel={currentMeetingInfo.MEMBERS}
+                                            onSelectionModelChange={selectEmployeHandler}
+                                            checkboxSelection
+                                            rows={employesRows} 
+                                            columns={columns}/>
+                                </div>
+
                                 <FormLabel>
                                     Гости
                                 </FormLabel>
-                                <DataGrid selectionModel={currentMeetingInfo.GUESTS}
+                                <div  className={style.dt}>
+                                    <DataGrid selectionModel={currentMeetingInfo.GUESTS}
                                         onSelectionModelChange={selectGuestsHandler}
                                         checkboxSelection
-                                        className={style.DataGrid} 
                                         rows={guestsRows} 
                                         columns={columns}/>
-                                        
+                                </div>
                             <div className={style.ButtonBlock}>
                                 <Button variant='contained'
                                     onClick={clickSendHandler}>Send</Button>

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import style from './addMeeting.module.scss';
 import { getCookie } from "cookies-next";
 import MeetingsAPI from "../../public/src/API/MeetingsAPI";
@@ -15,6 +15,7 @@ import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import JWT from 'jwt-decode';
 import IMeeting from '../../public/src/types/Meeting.model'
 import GeustAPI from "../../public/src/API/GeustAPI";
+import {isAfter} from 'date-fns'
 
 interface IAddMeetingPage {
     employesRows:  GridRowsProp | any
@@ -46,20 +47,22 @@ const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => 
     const router = useRouter();
 
     const addClickHandler: MouseEventHandler = (e) =>  {
-        (async() => {
-            try{
-                const {user} = JWT(token) as {user:any}
-                const meeting = await MeetingsAPI.addMeeting({INICIATOR_ID:user.ID  ,...meetingInfo},token);
-                console.log(meeting)
-            }
-            catch(e){
-                alert('что-то пошло не так');
-            }
-            finally{
-                router.push('/meetings');
-            }
+        if(!isAfter(meetingInfo.START_DATE,meetingInfo.END_DATE)){
+            (async() => {
+                try{
+                    const {user} = JWT(token) as {user:any}
+                    const meeting = await MeetingsAPI.addMeeting({INICIATOR_ID:user.ID  ,...meetingInfo},token);
+                    console.log(meeting)
+                }
+                catch(e){
+                    alert('что-то пошло не так');
+                }
+                finally{
+                    router.push('/meetings');
+                }
 
-        })()
+            })()
+        }
     }
     
     const selectEmployeHandler = (e:any) => {
@@ -69,12 +72,18 @@ const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => 
     const selectGuestsHandler = (e:any) => {
         setMeetingInfo({...meetingInfo, GUESTS:e})
     }
+
+    useEffect(()=>{
+        console.log(isAfter(meetingInfo.START_DATE,meetingInfo.END_DATE))
+    })
+
     return(
         <div className={style.main}>
             <FormControl className={style.Form}>
                 <div className={style.PickersBlock}>
                     <LocalizationProvider dateAdapter={AdapterDateFns} >
-                            <DateTimePicker hideTabs
+                            <DateTimePicker 
+                                            hideTabs
                                             showTodayButton
                                             className={style.Picker} label='Начало встречи' 
                                             onChange={(date) => {
@@ -84,7 +93,8 @@ const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => 
                                                 }} 
                                             value={meetingInfo.START_DATE} 
                                             renderInput={(props) => <TextField
-                                                error={meetingInfo.START_DATE >= meetingInfo.END_DATE}
+                                                helperText={isAfter(meetingInfo.START_DATE,meetingInfo.END_DATE) && 'Дата начала не может быть позже конца'}
+                                                error={isAfter(meetingInfo.START_DATE,meetingInfo.END_DATE)}
                                                 className={style.inputPicker} {...props}/> } />
                             
                             <DateTimePicker label='Конец встречи' 
@@ -95,7 +105,7 @@ const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => 
                                                 }}
                                             value={meetingInfo.END_DATE} 
                                             renderInput={(props) => <TextField 
-                                                error={meetingInfo.START_DATE >= meetingInfo.END_DATE}  
+                                                error={isAfter(meetingInfo.START_DATE,meetingInfo.END_DATE)}  
                                                 className={style.inputPicker} {...props}/> }/>
                     </LocalizationProvider>
                 </div>

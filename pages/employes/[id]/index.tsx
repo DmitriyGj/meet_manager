@@ -17,14 +17,6 @@ const UserPage = (props: UserPageProps) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
         const token = ctx.req.cookies['token']
-        if(!token ){
-            return {
-                redirect: {
-                    destination:'/login',
-                    permanent:false
-                }
-            }
-        }
         const {id} = ctx.query;
         const userInfo = await EmployeAPI.getEmployeById(id as string, token)
         

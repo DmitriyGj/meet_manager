@@ -1,6 +1,6 @@
 import { useRouter } from "next/router"
 import {GetServerSideProps } from 'next';
-import { ChangeEvent, FormEvent, MouseEventHandler, useEffect, useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import style from './addMeeting.module.scss';
 import { getCookie } from "cookies-next";
 import MeetingsAPI from "../../public/src/API/MeetingsAPI";
@@ -10,7 +10,7 @@ import { FormControl, FormLabel, TextField } from "@mui/material";
 import { IEmploye } from "../../public/src/types/Employe.model";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {Button } from '@mui/material';
-import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
+import { DataGrid,  GridRowsProp } from "@mui/x-data-grid";
 import translatorFieldsToRULabels from "../../public/src/utils/translatorToRU";
 import JWT from 'jwt-decode';
 import IMeeting from '../../public/src/types/Meeting.model'
@@ -42,7 +42,7 @@ const gugestColumns = [{ field:'ID', headerName: translatorFieldsToRULabels.Empl
 ]
 
 const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => {
-    const [meetingInfo, setMeetingInfo] = useState<Partial<IMeeting>>({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[], GUESTS:[]});
+    const [meetingInfo, setMeetingInfo] = useState<IMeeting >({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[], GUESTS:[]});
     const router = useRouter();
 
     const addClickHandler: MouseEventHandler = (e) =>  {
@@ -81,38 +81,47 @@ const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => 
                                                     if(date){
                                                         setMeetingInfo({...meetingInfo,START_DATE:date});
                                                     }
-                                                }}  
+                                                }} 
                                             value={meetingInfo.START_DATE} 
-                                            renderInput={(props) => <TextField className={style.inputPicker} {...props}/> } />
+                                            renderInput={(props) => <TextField
+                                                error={meetingInfo.START_DATE >= meetingInfo.END_DATE}
+                                                className={style.inputPicker} {...props}/> } />
                             
                             <DateTimePicker label='Конец встречи' 
                                             onChange={(date) => {
                                                     if(date){
                                                         setMeetingInfo({...meetingInfo,END_DATE:date});
                                                     }
-                                                }}  
+                                                }}
                                             value={meetingInfo.END_DATE} 
-                                            renderInput={(props) => <TextField className={style.inputPicker} {...props}/> }/>
+                                            renderInput={(props) => <TextField 
+                                                error={meetingInfo.START_DATE >= meetingInfo.END_DATE}  
+                                                className={style.inputPicker} {...props}/> }/>
                     </LocalizationProvider>
                 </div>
-                    <FormLabel>
-                        Участники
-                    </FormLabel>
+                <FormLabel>
+                    Участники
+                </FormLabel>
+                <div className={style.dt}>
                     <DataGrid 
-                            onSelectionModelChange={selectEmployeHandler}
-                            checkboxSelection
-                            rows={employesRows} 
-                            columns={employeColumns}/>
-                    
-                    <FormLabel>
-                        Гости
-                    </FormLabel>
+                        onSelectionModelChange={selectEmployeHandler}
+                        checkboxSelection
+                        rows={employesRows} 
+                        columns={employeColumns}/>
+                </div>
+
+                
+                <FormLabel >
+                    Гости
+                </FormLabel>
+                <div className={style.dt}>
                     <DataGrid 
                             onSelectionModelChange={selectGuestsHandler}
                             checkboxSelection
                             rows={guestsRows} 
                             columns={gugestColumns}/>
 
+                </div>
                             
                 <div className={style.ButtonBlock}>
                     <Button variant='contained'
@@ -129,8 +138,8 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
     try{
         const {res,req } = ctx
         const token = getCookie('token', {req,res})
-        const emplyoes = await EmployeAPI.getEmployes(token as string);
-        if(emplyoes === 403 || emplyoes === 401){
+        const employes = await EmployeAPI.getEmployes(token as string);
+        if(employes === 403 || employes === 401){
             return {
                 redirect: {
                     destination:'/login',
@@ -149,7 +158,7 @@ export const getServerSideProps : GetServerSideProps = async(ctx) => {
         }
         const guests = await GeustAPI.getGuests(token as string);
 
-        const employesRows = (emplyoes as IEmploye[]).map((item) => ({id: item.ID, ...item}))
+        const employesRows = (employes as IEmploye[]).map((item) => ({id: item.ID, ...item}))
         const guestsRows = (guests as IEmploye[]).map((item) => ({id: item.ID, ...item}))
         return {
             props: {

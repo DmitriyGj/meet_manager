@@ -30,61 +30,6 @@ const columns = [{ field:'ID', headerName: translatorFieldsToRULabels.Employe['I
     {field:'EMAIL', headerName: translatorFieldsToRULabels.Employe['EMAIL'], width:150},
 ]
 
-const CustomExportButton = (props: ButtonProps) => 
-    (<GridToolbarExportContainer {...props}>
-        <ExcelExportMenuItem/>
-    </GridToolbarExportContainer>)
-
-const getExcel = (apiRef: React.MutableRefObject<GridApi>) => {
-    const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
-    const visibleColumnsField = gridVisibleColumnFieldsSelector(apiRef);
-    const data = filteredSortedRowIds.map((id) => {//fix
-        const row: Record<string, any> = {};
-        visibleColumnsField.forEach((field) => row[translatorFieldsToRULabels.Employe[field]] = apiRef.current.getCellParams(id, field).value);
-        return row;
-    });
-    const parsedColimns = visibleColumnsField.map((field) =>{return {field:translatorFieldsToRULabels.Employe[field], width:150} as GridColDef});
-    return {data, columns: parsedColimns };
-};
-
-const ExcelExportMenuItem = (props: GridExportMenuItemProps<{}>) => {
-    const apiRef = useGridApiContext();
-    const _export = useRef<ExcelExport | null>(null);
-    const excelExport = (rows:any,columns:any) => {
-        if (_export.current !== null) {
-            _export.current.save(rows,columns);
-        }
-    };
-
-    const { hideMenu } = props;
-
-    return (
-        <MenuItem
-        onClick={() => {
-            const excelData = getExcel(apiRef);
-            excelExport(excelData.data, excelData.columns);
-            hideMenu?.();
-        }}
-        >
-            <ExcelExport ref={_export}>
-                Export Excel
-            </ExcelExport>
-        </MenuItem>
-    );
-};
-
-const GridColumnMenu = forwardRef<
-                    HTMLUListElement,
-                    GridColumnMenuProps
-                    >(function GridColumnMenu(props: GridColumnMenuProps, ref) {
-                    const { hideMenu, currentColumn } = props;
-
-                    return (
-                        <GridColumnMenuContainer ref={ref} {...props}>
-                            <SortGridMenuItems onClick={hideMenu} column={currentColumn!} />
-                        </GridColumnMenuContainer>
-                        );
-                    });
 
 const Employes = ({rows, token, ROLE_NAME} : IEmployesPage) => {
     const router = useRouter();
@@ -92,14 +37,6 @@ const Employes = ({rows, token, ROLE_NAME} : IEmployesPage) => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null)
     const [showStats, setShowStats] = useState(false);
     const [chartInfo, setChartInfo] = useState<BarInfo[]>([]);
-
-    const clickStatsHandler = () => {
-        (async() => {
-            //fix const chartInfoRes = await GuestAPI.getEmployeChartInfo();
-            // setChartInfo(chartInfoRes || []);
-        })()
-        setShowStats(true);
-    }
 
     const clickChangeHandler = () => {
         if(selectedRow){
@@ -129,12 +66,6 @@ const Employes = ({rows, token, ROLE_NAME} : IEmployesPage) => {
         })();
     }
 
-    const CustomToolbar = () => 
-    (<GridToolbarContainer className={style.Toolbar}>
-        <CustomExportButton className={style.ExportBtn} />
-        <Button onClick={clickStatsHandler} className={style.ExportBtn}><ShowChart/> Stats</Button>
-    </GridToolbarContainer>)
-
     return (<div className={style.container}>
                 <h1>Гости</h1>
                 {showStats &&
@@ -144,8 +75,7 @@ const Employes = ({rows, token, ROLE_NAME} : IEmployesPage) => {
                             }}>
                         <EmployeChart title ='Количество встреч' dataset={chartInfo}/>
                     </ModalWindow> }
-                <DataGrid components={{Toolbar: CustomToolbar, 
-                                        ColumnMenu: GridColumnMenu}} 
+                <DataGrid 
                     ref={gridRef} 
                     onRowDoubleClick={e=> router.push(`/guests/${e.id}`)}
                     onSelectionModelChange={(e) => {

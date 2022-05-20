@@ -43,7 +43,7 @@ const gugestColumns = [{ field:'ID', headerName: translatorFieldsToRULabels.Empl
 ]
 
 const AddMeetingPage = ({employesRows, guestsRows , token}: IAddMeetingPage) => {
-    const [meetingInfo, setMeetingInfo] = useState<Partial<IMeeting>>({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[], GUESTS:[]});
+    const [meetingInfo, setMeetingInfo] = useState({START_DATE:new Date(), END_DATE:new Date(), MEMBERS:[], GUESTS:[]});
     const router = useRouter();
 
     const addClickHandler: MouseEventHandler = (e) =>  {

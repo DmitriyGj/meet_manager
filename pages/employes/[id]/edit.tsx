@@ -25,7 +25,7 @@ interface EditEmployePageProps {
 
 const excludeToShow= ['ID', 'USER_ID' ,'ROLE_NAME','POST_NAME', 'DEPART_ID','DEPART_NAME']
 
-const AddEmployePage = ({employeInfo, selectOptions, ROLE_NAME, ID, token}: EditEmployePageProps) => {
+const AddEmployePage = ({employeInfo, selectOptions, token}: EditEmployePageProps) => {
 
     const editHandler = (values: IEmployeResonseData) => {
         (async() => {
@@ -48,7 +48,7 @@ const AddEmployePage = ({employeInfo, selectOptions, ROLE_NAME, ID, token}: Edit
     {({errors, values, touched, handleChange, handleSubmit, handleBlur})=>
         <Form className={style.Form} onSubmit={handleSubmit}>
             <FormLabel>
-                Изменение работника
+                Форма работника
             </FormLabel>
             <Card className={style.Card}>
                 <FormControl className={style.FormControl}>

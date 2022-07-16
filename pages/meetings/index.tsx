@@ -8,6 +8,7 @@ import MeetingsAPI from '../../public/src/API/MeetingsAPI';
 import { getCookie } from 'cookies-next';
 import IMeeting from '../../public/src/types/Meeting.model';
 import JWT from 'jwt-decode';
+import {format} from 'date-fns';
 
 interface IMeetingsPage {
     rows:  GridRowsProp | any
@@ -18,8 +19,20 @@ interface IMeetingsPage {
 
 const columns: GridColDef[] =
 [{field: 'ID' , headerName: 'ID', width:150},
-{field: 'START_DATE' , headerName: 'Начало', width:500},
-{field: 'END_DATE' , headerName: 'Конец', width:500}]
+{field: 'START_DATE' , headerName: 'Начало', width:300, valueFormatter: params => {
+    if(!params.value) {
+        return '';
+    }
+
+    return format(new Date(params.value as string), 'dd MMMM yyyy  HH:mm');
+}},
+{field: 'END_DATE' , headerName: 'Конец', width:300, valueFormatter: params => {
+    if(!params.value) {
+        return '';
+    }
+
+    return format(new Date(params.value as string), 'dd MMMM yyyy  HH:mm');}
+}]
 
 const Meetings = ({rows, token, ID, ROLE_NAME} : IMeetingsPage) => {
     const router = useRouter();

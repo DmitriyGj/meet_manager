@@ -3,11 +3,23 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useRouter } from "next/router";
 import style from './UserProfile.module.scss';
 import { Buffer } from "../../types/Buffer";
+import {format} from 'date-fns';
 
 const columns: GridColDef[] =
 [{field: 'ID' , headerName: 'ID', width:150},
-{field: 'START_DATE' , headerName: 'Начало', width:250},
-{field: 'END_DATE' , headerName: 'Конец', width:250}]
+{field: 'START_DATE' , headerName: 'Начало', width:250, valueFormatter: (params) => {
+    if(!params.value){
+        return '';
+    }
+    return format( new Date(params.value as string), "dd MMMM yyyy HH:mm")
+}},
+{field: 'END_DATE' , headerName: 'Конец', width:250 , 
+valueFormatter: (params) => {
+    if(!params.value){
+        return '';
+    }
+    return format(new Date(params.value as string), "dd MMMM yyyy HH:mm")
+}}]
 
 interface UserProfileProps {
     userInfo: any
@@ -28,8 +40,6 @@ const TranslateToRuLables:Buffer<Buffer<string>> = {
 }
 
 const excludeToShow = ['POST_ID', 'ROLE_ID', 'ID', 'USER_ID', 'NAME', 'LAST_NAME', 'PATRONYMIC', 'PASSWORD', 'ROLE_NAME', "DEPART_ID"]
-
-
 
 export const UserProfile = ({userInfo, meetings, initedMeetings}: UserProfileProps) => {
     const {NAME, LAST_NAME, ID, USER_ID, ROLE_NAME, PATRONYMIC} = userInfo;
